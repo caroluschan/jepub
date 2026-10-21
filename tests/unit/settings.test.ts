@@ -1,0 +1,88 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+import {
+  DEFAULT_SETTINGS,
+  SETTINGS_KEY,
+  loadSettings,
+  saveSettings,
+} from '../../src/lib/settings/settings';
+
+beforeEach(() => {
+  localStorage.clear();
+});
+
+describe('settings', () => {
+  it('SET-DEFAULTS returns the documented defaults when nothing is stored', () => {
+    expect(loadSettings()).toEqual({
+      theme: 'light',
+      fontSize: 19,
+      orientation: 'horizontal',
+      furigana: true,
+      furiganaScript: 'katakana',
+      onlineTranslation: false,
+    });
+    expect(DEFAULT_SETTINGS.onlineTranslation).toBe(false);
+    expect(DEFAULT_SETTINGS.furiganaScript).toBe('katakana');
+  });
+
+  it('SET-CORRUPT ignores invalid JSON and invalid individual keys', () => {
+    localStorage.setItem(SETTINGS_KEY, '{not json');
+    expect(loadSettings()).toEqual(DEFAULT_SETTINGS);
+
+    localStorage.setItem(
+      SETTINGS_KEY,
+      JSON.stringify({ theme: 'blue', fontSize: 'huge', orientation: 'diagonal', furigana: false }),
+    );
+    expect(loadSettings()).toEqual({
+      ...DEFAULT_SETTINGS,
+      furigana: false,
+    });
+  });
+
+  it('SET-PERSIST writes a partial update and reads it back', () => {
+    const saved = saveSettings({ theme: 'dark', fontSize: 24 });
+    expect(saved.theme).toBe('dark');
+    expect(saved.fontSize).toBe(24);
+
+    const reloaded = loadSettings();
+    expect(reloaded.theme).toBe('dark');
+    expect(reloaded.fontSize).toBe(24);
+    expect(reloaded.orientation).toBe('horizontal');
+  });
+
+  it('SET-ONLINE-OFF defaults online translation off and persists an opt-in', () => {
+    expect(loadSettings().onlineTranslation).toBe(false);
+    saveSettings({ onlineTranslation: true });
+    expect(loadSettings().onlineTranslation).toBe(true);
+    expect(JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}')).toMatchObject({
+      onlineTranslation: true,
+    });
+  });
+
+  it('SET-SCRIPT defaults to katakana and persists a hiragana choice', () => {
+    expect(loadSettings().furiganaScript).toBe('katakana');
+    saveSettings({ furiganaScript: 'hiragana' });
+    expect(loadSettings().furiganaScript).toBe('hiragana');
+    saveSettings({ furiganaScript: 'katakana' });
+    expect(loadSettings().furiganaScript).toBe('katakana');
+
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ furiganaScript: 'romaji' }));
+    expect(loadSettings().furiganaScript).toBe('katakana');
+  });
+
+  it('SET-CLAMP clamps font size to 14..32 and rejects non-numbers', () => {
+    expect(saveSettings({ fontSize: 100 }).fontSize).toBe(32);
+    expect(saveSettings({ fontSize: 1 }).fontSize).toBe(14);
+
+    // Reset first: otherwise this reads the 14 from the previous line rather
+    // than proving NaN falls back to the documented default.
+    localStorage.clear();
+    expect(saveSettings({ fontSize: Number.NaN }).fontSize).toBe(DEFAULT_SETTINGS.fontSize);
+
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ fontSize: Number.NaN }));
+    expect(loadSettings().fontSize).toBe(19);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ fontSize: 13 }));
+    expect(loadSettings().fontSize).toBe(14);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ fontSize: 99 }));
+    expect(loadSettings().fontSize).toBe(32);
+  });
+});

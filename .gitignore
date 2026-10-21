@@ -1,0 +1,10 @@
+node_modules
+public/kuromoji-dict
+test-results
+playwright-report
+coverage
+.artifacts
+.omo
+.playwright-mcp
+*.log
+.DS_Store

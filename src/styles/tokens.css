@@ -1,0 +1,57 @@
+:root {
+  color-scheme: light;
+  --paper: #f4f1e8;
+  --surface: #fbf9f4;
+  --sheet: #fffdf9;
+  --ink: #141311;
+  --muted: #5f5b52;
+  --ruby: #4e4a42;
+  --line: #d9d4c9;
+  --line-strong: #b8b1a3;
+  --inverse-bg: #141311;
+  --inverse-ink: #fbf9f4;
+  --focus: #141311;
+  --wash: rgb(20 19 17 / 7%);
+  --wash-strong: rgb(20 19 17 / 12%);
+  --backdrop: rgb(0 0 0 / 45%);
+  --shadow: 0 24px 70px rgb(20 19 17 / 12%);
+  --font-ui: "Helvetica Neue", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --font-reading: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", "Songti SC", serif;
+  --font-english: Georgia, "Times New Roman", serif;
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 190ms;
+  --toolbar-height: 56px;
+  --status-height: 48px;
+  --reader-size: 19px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --max-library: 1080px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0d0d0c;
+  --surface: #151513;
+  --sheet: #171715;
+  --ink: #f0ede5;
+  --muted: #b3ada0;
+  --ruby: #c8c1b2;
+  --line: #2c2b27;
+  --line-strong: #4a4740;
+  --inverse-bg: #f0ede5;
+  --inverse-ink: #0d0d0c;
+  --focus: #f0ede5;
+  --wash: rgb(240 237 229 / 7%);
+  --wash-strong: rgb(240 237 229 / 13%);
+  --backdrop: rgb(0 0 0 / 65%);
+  --shadow: 0 24px 80px rgb(0 0 0 / 55%);
+}

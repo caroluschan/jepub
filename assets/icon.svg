@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="JEPUB">
+  <rect width="512" height="512" rx="96" fill="#f4f1e8"/>
+  <g fill="none" stroke="#141311" stroke-width="26" stroke-linecap="square">
+    <path d="M170 132h120a52 52 0 0 1 52 52v196"/>
+    <path d="M170 132v248"/>
+    <path d="M170 380h172"/>
+    <path d="M222 210h78"/>
+    <path d="M222 262h62"/>
+    <path d="M222 314h44"/>
+  </g>
+</svg>

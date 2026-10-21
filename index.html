@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f1e8" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="JEPUB is a quiet Japanese EPUB reader with furigana, sentence translation, and read-aloud. Books stay on your device."
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="JEPUB" />
+    <link rel="icon" type="image/svg+xml" href="/jepub/favicon.svg" />
+    <link rel="apple-touch-icon" href="/jepub/icons/apple-touch-icon-180.png" />
+    <title>JEPUB — Japanese EPUB Reader</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('jepub:settings:v1');
+          if (stored === null) return;
+          var parsed = JSON.parse(stored);
+          if (parsed !== null && parsed.theme === 'dark') {
+            document.documentElement.dataset.theme = 'dark';
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta !== null) meta.setAttribute('content', '#0d0d0c');
+          }
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
