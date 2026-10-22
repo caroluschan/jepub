@@ -79,8 +79,8 @@ export default defineConfig({
         },
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,webp,woff2,epub}'],
-        globIgnores: ['kuromoji-dict/**'],
+        globPatterns: ['**/*.{js,mjs,css,html,png,svg,webp,woff2,epub,wasm}'],
+        globIgnores: ['kuromoji-dict/**', 'assets/ort-wasm-*.wasm', 'assets/ort-wasm-*.mjs'],
         additionalManifestEntries: dictManifestEntries,
         maximumFileSizeToCacheInBytes: 40 * 1024 * 1024,
         cleanupOutdatedCaches: true,

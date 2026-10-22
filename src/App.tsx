@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/Toast';
+import { ChatPage } from './features/chat/ChatPage';
 import { LibraryPage } from './features/library/LibraryPage';
 import { ReaderPage } from './features/reader/ReaderPage';
+import { LlmProvider } from './features/ai/LlmProvider';
 import { SettingsPage } from './features/settings/SettingsPage';
 import { SettingsProvider, useSettings } from './features/settings/SettingsProvider';
 import { parseRoute, type Route } from './lib/router';
@@ -36,7 +38,13 @@ function AppShell() {
 
   return (
     <>
-      {route.name === 'reader' ? <ReaderPage bookId={route.bookId} /> : <LibraryPage />}
+      {route.name === 'reader' ? (
+        <ReaderPage bookId={route.bookId} />
+      ) : route.name === 'chat' ? (
+        <ChatPage sessionId={route.sessionId} />
+      ) : (
+        <LibraryPage />
+      )}
       {settingsOpen ? <SettingsPage /> : null}
       <UpdateToast />
     </>
@@ -47,9 +55,11 @@ export default function App() {
   return (
     <SettingsProvider>
       <ToastProvider>
-        <ErrorBoundary>
-          <AppShell />
-        </ErrorBoundary>
+        <LlmProvider>
+          <ErrorBoundary>
+            <AppShell />
+          </ErrorBoundary>
+        </LlmProvider>
       </ToastProvider>
     </SettingsProvider>
   );

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const scripts = ['copy-dict.mjs', 'make-icons.mjs', 'make-sample-epub.mjs'];
+const scripts = ['copy-dict.mjs', 'copy-ort.mjs', 'make-icons.mjs', 'make-sample-epub.mjs'];
 
 function run(script) {
   return new Promise((resolve, reject) => {

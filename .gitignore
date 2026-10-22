@@ -1,5 +1,6 @@
 node_modules
 public/kuromoji-dict
+public/ort
 test-results
 playwright-report
 coverage

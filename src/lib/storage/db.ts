@@ -5,6 +5,7 @@ import type {
   BookRecord,
   ChapterSet,
   TranslationProvider,
+  ChatSession,
 } from '../types';
 import type { AssetInput, StoredAsset, StoredFile, StoredTranslation } from './types';
 
@@ -37,6 +38,11 @@ interface JepubDatabase extends DBSchema {
     value: Bookmark;
     indexes: { bookId: string };
   };
+  chatSessions: {
+    key: string;
+    value: ChatSession;
+    indexes: { updatedAt: number };
+  };
 }
 
 export function assetKey(bookId: string, path: string): string {
@@ -50,7 +56,7 @@ export function openDb(): Promise<IDBPDatabase<JepubDatabase>> {
     // Promise.resolve().then() also converts a synchronous IndexedDB failure
     // into a rejection instead of throwing out of openDb().
     const attempt = Promise.resolve().then(() =>
-      openDB<JepubDatabase>('jepub', 2, {
+      openDB<JepubDatabase>('jepub', 3, {
         upgrade(database, oldVersion) {
           if (oldVersion < 1) {
             const books = database.createObjectStore('books', { keyPath: 'id' });
@@ -70,6 +76,11 @@ export function openDb(): Promise<IDBPDatabase<JepubDatabase>> {
           if (oldVersion < 2) {
             const bookmarks = database.createObjectStore('bookmarks', { keyPath: 'id' });
             bookmarks.createIndex('bookId', 'bookId');
+          }
+
+          if (oldVersion < 3) {
+            const chatSessions = database.createObjectStore('chatSessions', { keyPath: 'id' });
+            chatSessions.createIndex('updatedAt', 'updatedAt');
           }
         },
       }),
@@ -210,4 +221,25 @@ export async function pruneTranslations(keep = 3000): Promise<void> {
     }
   }
   await transaction.done;
+}
+
+export async function putChatSession(session: ChatSession): Promise<void> {
+  const database = await openDb();
+  await database.put('chatSessions', session);
+}
+
+export async function getChatSession(id: string): Promise<ChatSession | null> {
+  const database = await openDb();
+  return (await database.get('chatSessions', id)) ?? null;
+}
+
+export async function listChatSessions(limit = 30): Promise<ChatSession[]> {
+  const database = await openDb();
+  const sessions = await database.getAllFromIndex('chatSessions', 'updatedAt');
+  return sessions.sort((left, right) => right.updatedAt - left.updatedAt).slice(0, limit);
+}
+
+export async function deleteChatSession(id: string): Promise<void> {
+  const database = await openDb();
+  await database.delete('chatSessions', id);
 }

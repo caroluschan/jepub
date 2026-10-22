@@ -55,7 +55,7 @@ test('@ui-language switches to Japanese, persists, and sets document lang', asyn
   await page.getByTestId('library-settings-button').click();
 
   await page.getByTestId('ui-language').selectOption('ja');
-  await expect(page.getByRole('heading', { name: '設定' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '設定', exact: true })).toBeVisible();
   await expect(page.getByText('外観')).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
   await page.getByTestId('settings-close').click();

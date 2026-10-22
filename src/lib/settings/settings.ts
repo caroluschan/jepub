@@ -14,6 +14,7 @@ export const DEFAULT_SETTINGS: Settings = Object.freeze({
   furigana: true,
   furiganaScript: 'katakana',
   onlineTranslation: false,
+  llmConsent: false,
   translationTarget: DEFAULT_TRANSLATION_TARGET,
   uiLanguage: DEFAULT_UI_LANGUAGE,
 });
@@ -46,6 +47,7 @@ function parseSettings(raw: unknown): Settings {
   const furigana = raw['furigana'];
   const furiganaScript = raw['furiganaScript'];
   const onlineTranslation = raw['onlineTranslation'];
+  const llmConsent = raw['llmConsent'];
   const translationTarget = raw['translationTarget'];
   const uiLanguage = raw['uiLanguage'];
 
@@ -68,6 +70,7 @@ function parseSettings(raw: unknown): Settings {
       typeof onlineTranslation === 'boolean'
         ? onlineTranslation
         : DEFAULT_SETTINGS.onlineTranslation,
+    llmConsent: typeof llmConsent === 'boolean' ? llmConsent : DEFAULT_SETTINGS.llmConsent,
     translationTarget: isTranslationTarget(translationTarget)
       ? translationTarget
       : DEFAULT_TRANSLATION_TARGET,
@@ -107,6 +110,9 @@ function applyPatch(current: Settings, patch: Partial<Settings>): Settings {
   }
   if (typeof patch.onlineTranslation === 'boolean') {
     next.onlineTranslation = patch.onlineTranslation;
+  }
+  if (typeof patch.llmConsent === 'boolean') {
+    next.llmConsent = patch.llmConsent;
   }
   if (isTranslationTarget(patch.translationTarget)) {
     next.translationTarget = patch.translationTarget;

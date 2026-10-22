@@ -19,10 +19,12 @@ describe('settings', () => {
       furigana: true,
       furiganaScript: 'katakana',
       onlineTranslation: false,
+      llmConsent: false,
       translationTarget: 'en',
       uiLanguage: 'system',
     });
     expect(DEFAULT_SETTINGS.onlineTranslation).toBe(false);
+    expect(DEFAULT_SETTINGS.llmConsent).toBe(false);
     expect(DEFAULT_SETTINGS.furiganaScript).toBe('katakana');
     expect(DEFAULT_SETTINGS.translationTarget).toBe('en');
   });

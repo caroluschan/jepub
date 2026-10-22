@@ -52,6 +52,13 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Translations are cached per language, so a translated sentence can be revisited instantly, even offline.
 - Play or stop the sentence with a Japanese (`ja-JP`) voice.
 
+**Local AI, only where it fits**
+- On supported devices, **Ask AI** explains grammar and meaning locally in the sentence panel.
+- **Chat More** opens a local chat; sessions are kept in IndexedDB on this device.
+- Uses a 4-bit Qwen3.5-0.8B model (about 645 MB). The model downloads once, only after an explicit warning and consent.
+- Requires WebGPU, iOS/iPadOS 26+, Android 12+, sufficient GPU storage-buffer limits, and free storage. On devices that do not meet the gate, every AI control is hidden.
+- This is a small local model: it can be slow and make mistakes. It is not a replacement for a teacher.
+
 **Listen**
 - Read a sentence aloud from the sentence panel.
 - Start chapter read-aloud from the toolbar; JEPUB highlights the active sentence and scrolls with the voice.
@@ -86,16 +93,16 @@ Once installed, the app opens without browser chrome and the dictionary is prepa
 
 Safari on iPhone does not expose an on-device translation API to websites or home-screen PWAs. The 39-language selector still works there, but translations use **MyMemory online** when you enable the online fallback.
 
-Offline translation on iPhone would require a native wrapper using Apple’s Translation framework, or a large local translation model. Neither is part of this PWA.
+Local AI is a separate, optional path. On iOS/iPadOS 26+ devices with WebGPU, enough GPU memory, and free storage, JEPUB can download and run the small Qwen model entirely on-device. Older devices keep the normal translation behavior and do not show AI controls.
 
 ## Browser support
 
-| Browser | Library & reader | On-device translation | Online fallback |
-|---|---|---|---|
-| Chrome / Edge desktop | Yes | Yes, 39 language packs | Optional |
-| Chrome Android | Yes | Not available from the web API | Optional |
-| Safari / iOS Safari | Yes | Not available from the web API | Optional |
-| Firefox | Yes | Not available from the web API | Optional |
+| Browser | Library & reader | On-device translation | Local AI | Online fallback |
+|---|---|---|---|---|
+| Chrome / Edge desktop | Yes | Yes, 39 language packs | WebGPU, 645 MB opt-in | Optional |
+| Chrome Android | Yes | Not available from the web API | Android 12+, WebGPU, buffer/storage gate | Optional |
+| Safari / iOS Safari | Yes | Not available from the web API | iOS/iPadOS 26+, WebGPU, buffer/storage gate | Optional |
+| Firefox | Yes | Not available from the web API | Not currently | Optional |
 
 The app itself works across modern browsers. Translation providers and installed speech voices vary by device.
 
@@ -103,6 +110,7 @@ The app itself works across modern browsers. Translation providers and installed
 
 - **No account, no analytics, no JEPUB server.** Your books stay in your browser’s storage.
 - **Online translation is opt-in.** When enabled, the selected sentence is sent to MyMemory and the provider is labeled in the sentence panel. With online translation off, only on-device translation and cached results are used.
+- **Local AI is opt-in.** After consent, the model downloads from Hugging Face and runs on this device. Sentences and chat messages are not sent to a JEPUB server. Chat sessions stay in IndexedDB. You can revoke consent or remove the model in Settings.
 - **Aozora imports** send the public Aozora URL through Jina Reader. Aozora works are public-domain texts.
 - **Speech** uses the operating system’s speech voices. Depending on the installed voice, the OS may use a local or cloud-backed voice.
 - **GitHub Pages** serves the app from a shared `github.io` origin. As with any project page, other pages on the same origin share browser storage permissions. Use a dedicated origin if you need stronger isolation.
@@ -164,6 +172,7 @@ The app is built for the project path `/jepub/`. If you fork it under a differen
 - Kuroshiro + kuromoji for furigana and romaji, with a custom browser dictionary loader
 - DOMPurify for sanitized ruby markup
 - Chrome built-in Translator API and MyMemory for translation
+- Transformers.js and ONNX Runtime WebGPU for optional local AI
 - Web Speech API for Japanese speech
 - Vitest and Playwright for tests
 
@@ -174,8 +183,10 @@ src/lib/epub/        EPUB container, OPF, TOC, content extraction
 src/lib/import/      EPUB, MOBI, text, Aozora, and persistence pipelines
 src/lib/furigana/    Kuroshiro, dictionary loader, queue, sanitizer
 src/lib/translate/   language list, providers, cache
-src/lib/reader/      scroll behavior
-src/features/        library, reader, sentence panel, settings
+src/lib/llm/        capability gate, model worker, prompts
+src/lib/chat/       local chat session helpers
+src/lib/reader/     scroll behavior
+src/features/       library, reader, sentence panel, settings, AI, chat
 src/pwa/             service worker update and file handling
 scripts/             dictionary, icons, and sample EPUB generation
 tests/               unit and end-to-end tests
@@ -192,6 +203,7 @@ docs/                committed production build
 - [Aozora Bunko](https://www.aozora.gr.jp/) for public-domain Japanese literature
 - [Jina Reader](https://jina.ai/reader/) for Aozora fetching
 - [MyMemory](https://mymemory.translated.net/) for optional online translation
+- [Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B) and [Transformers.js](https://huggingface.co/docs/transformers.js) for optional local AI
 
 Third-party dependencies retain their own licenses.
 

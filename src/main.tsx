@@ -9,6 +9,8 @@ import './styles/add-book.css';
 import './styles/reader.css';
 import './styles/sentence.css';
 import './styles/settings.css';
+import './styles/ai.css';
+import './styles/chat.css';
 
 const container = document.getElementById('root');
 if (container === null) {

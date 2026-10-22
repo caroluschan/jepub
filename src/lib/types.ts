@@ -3,6 +3,7 @@ export type Orientation = 'horizontal' | 'vertical';
 export type FuriganaScript = 'katakana' | 'hiragana';
 
 export interface Settings {
+  llmConsent: boolean;
   theme: Theme;
   fontSize: number;
   orientation: Orientation;
@@ -96,6 +97,38 @@ export interface ImportedBook {
 }
 
 export type TranslationProvider = 'on-device' | 'mymemory';
+
+export type LlmUnsupportedReason =
+  | 'no-webgpu'
+  | 'os-version'
+  | 'storage-buffer'
+  | 'storage-space'
+  | 'unknown';
+
+export interface LlmSupport {
+  supported: boolean;
+  reason: LlmUnsupportedReason | null;
+  maxBufferSize: number | null;
+  maxStorageBufferBindingSize: number | null;
+  freeStorage: number | null;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: number;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  createdAt: number;
+  updatedAt: number;
+  bookId?: string | null;
+  sentence?: string | null;
+}
 
 export interface TranslationResult {
   text: string;

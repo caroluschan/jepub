@@ -14,6 +14,7 @@ import { TRANSLATION_LANGUAGES } from '../../lib/translate/languages';
 import { MAX_FONT_SIZE, MIN_FONT_SIZE } from '../../lib/settings/settings';
 import { useI18n } from '../../lib/i18n/useI18n';
 import { useSettings } from './SettingsProvider';
+import { AiSettingsSection } from '../ai/AiSettingsSection';
 
 const VERSION = '0.1.0';
 const GITHUB_URL = 'https://github.com/caroluschan/jepub';
@@ -403,6 +404,8 @@ export function SettingsPage() {
               </div>
             </div>
           </section>
+
+          <AiSettingsSection />
 
           <section className="settings-group" aria-labelledby="settings-storage">
             <div className="settings-group__head">

@@ -1,4 +1,7 @@
-export type Route = { name: 'library' } | { name: 'reader'; bookId: string };
+export type Route =
+  | { name: 'library' }
+  | { name: 'reader'; bookId: string }
+  | { name: 'chat'; sessionId: string | null };
 
 const LIBRARY: Route = { name: 'library' };
 
@@ -13,6 +16,16 @@ export function parseRoute(hash: string): Route | null {
 
   const path = hash.slice(1);
   const segments = path.split('/').filter((segment) => segment.length > 0);
+
+  if (segments[0] === 'chat') {
+    if (segments[1] === undefined) return { name: 'chat', sessionId: null };
+    try {
+      const sessionId = decodeURIComponent(segments[1]);
+      return sessionId.length === 0 ? { name: 'chat', sessionId: null } : { name: 'chat', sessionId };
+    } catch {
+      return LIBRARY;
+    }
+  }
 
   if (segments[0] !== 'read' || segments[1] === undefined) {
     return LIBRARY;
@@ -33,4 +46,8 @@ export function navigateToLibrary(): void {
 
 export function navigateToBook(id: string): void {
   window.location.hash = `#/read/${encodeURIComponent(id)}`;
+}
+
+export function navigateToChat(sessionId: string): void {
+  window.location.hash = `#/chat/${encodeURIComponent(sessionId)}`;
 }

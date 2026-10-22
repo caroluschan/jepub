@@ -13,6 +13,7 @@ import { useI18n } from '../../lib/i18n/useI18n';
 import { TRANSLATION_LANGUAGES } from '../../lib/translate/languages';
 import type { TranslationProvider } from '../../lib/types';
 import { useSettings } from '../settings/SettingsProvider';
+import { AskAiSection } from '../ai/AskAiSection';
 import { useSentenceDetails, type TranslationView } from './useSentenceDetails';
 
 interface SentenceSheetProps {
@@ -268,6 +269,13 @@ export function SentenceSheet({ sentence, onClose, restoreFocus }: SentenceSheet
             />
           </div>
         </div>
+
+        <AskAiSection
+          sentence={sentence}
+          rubyHtml={rubyHtml}
+          romaji={romaji}
+          translation={translation.status === 'ready' ? translation.text : null}
+        />
       </div>
 
       <div className="sentence-sheet__foot">
