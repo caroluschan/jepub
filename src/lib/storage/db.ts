@@ -6,6 +6,7 @@ import type {
   ChapterSet,
   TranslationProvider,
   ChatSession,
+  KnowledgeRecord,
 } from '../types';
 import type { AssetInput, StoredAsset, StoredFile, StoredTranslation } from './types';
 
@@ -43,6 +44,11 @@ interface JepubDatabase extends DBSchema {
     value: ChatSession;
     indexes: { updatedAt: number };
   };
+  knowledge: {
+    key: string;
+    value: KnowledgeRecord;
+    indexes: { createdAt: number; fingerprint: string };
+  };
 }
 
 export function assetKey(bookId: string, path: string): string {
@@ -56,7 +62,7 @@ export function openDb(): Promise<IDBPDatabase<JepubDatabase>> {
     // Promise.resolve().then() also converts a synchronous IndexedDB failure
     // into a rejection instead of throwing out of openDb().
     const attempt = Promise.resolve().then(() =>
-      openDB<JepubDatabase>('jepub', 3, {
+      openDB<JepubDatabase>('jepub', 4, {
         upgrade(database, oldVersion) {
           if (oldVersion < 1) {
             const books = database.createObjectStore('books', { keyPath: 'id' });
@@ -81,6 +87,12 @@ export function openDb(): Promise<IDBPDatabase<JepubDatabase>> {
           if (oldVersion < 3) {
             const chatSessions = database.createObjectStore('chatSessions', { keyPath: 'id' });
             chatSessions.createIndex('updatedAt', 'updatedAt');
+          }
+
+          if (oldVersion < 4) {
+            const knowledge = database.createObjectStore('knowledge', { keyPath: 'id' });
+            knowledge.createIndex('createdAt', 'createdAt');
+            knowledge.createIndex('fingerprint', 'fingerprint');
           }
         },
       }),
@@ -242,4 +254,31 @@ export async function listChatSessions(limit = 30): Promise<ChatSession[]> {
 export async function deleteChatSession(id: string): Promise<void> {
   const database = await openDb();
   await database.delete('chatSessions', id);
+}
+
+export async function saveKnowledgeRecord(record: KnowledgeRecord): Promise<void> {
+  const database = await openDb();
+  const existing = await database.getAllFromIndex('knowledge', 'fingerprint', record.fingerprint);
+  const previous = existing[0];
+  await database.put('knowledge', {
+    ...record,
+    ...(previous === undefined ? {} : { id: previous.id, createdAt: previous.createdAt }),
+  });
+}
+
+export async function listKnowledgeRecords(): Promise<KnowledgeRecord[]> {
+  const database = await openDb();
+  const records = await database.getAll('knowledge');
+  return records.sort((left, right) => right.createdAt - left.createdAt);
+}
+
+export async function deleteKnowledgeRecord(id: string): Promise<void> {
+  const database = await openDb();
+  await database.delete('knowledge', id);
+}
+
+export async function getRandomKnowledgeRecord(): Promise<KnowledgeRecord | null> {
+  const records = await listKnowledgeRecords();
+  if (records.length === 0) return null;
+  return records[Math.floor(Math.random() * records.length)] ?? null;
 }

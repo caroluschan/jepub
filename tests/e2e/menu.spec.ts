@@ -6,6 +6,8 @@ test('@menu contains library actions and opens the saved chat room', async ({ pa
   await openAppMenu(page);
 
   await expect(page.getByTestId('menu-chat')).toBeVisible();
+  await expect(page.getByTestId('menu-mypedia')).toBeVisible();
+  await expect(page.getByTestId('menu-quiz')).toHaveCount(0);
   await expect(page.getByTestId('menu-settings')).toBeVisible();
   await expect(page.getByTestId('menu-add-book')).toBeVisible();
   await expect(page.getByTestId('menu-theme')).toBeVisible();

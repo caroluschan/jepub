@@ -32,6 +32,7 @@ interface LlmContextValue {
   generate: (
     messages: ChatMessage[],
     onToken: (token: string) => void,
+    maxTokens?: number,
   ) => Promise<string>;
   resetModel: () => Promise<void>;
 }
@@ -139,7 +140,11 @@ export function LlmProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const generate = useCallback(
-    async (messages: ChatMessage[], onToken: (token: string) => void): Promise<string> => {
+    async (
+      messages: ChatMessage[],
+      onToken: (token: string) => void,
+      maxTokens?: number,
+    ): Promise<string> => {
       if (mode === 'byot') {
         if (!online) throw new Error('BYOT needs an internet connection.');
         if (!byotConfigured) throw new Error('Set up BYOT in AI settings first.');
@@ -164,7 +169,7 @@ export function LlmProvider({ children }: { children: ReactNode }) {
       await ensureReady();
       const client = clientRef.current;
       if (client === null) throw new Error('The local AI model is not available.');
-      return client.generate(messages, onToken);
+      return client.generate(messages, onToken, maxTokens);
     },
     [byotConfigured, ensureReady, mode, online, selectedModel, settings.aiApiKey, settings.aiBaseUrl, settings.aiProvider],
   );

@@ -142,6 +142,29 @@ export interface ChatMessage {
   createdAt: number;
 }
 
+export type KnowledgeKind = 'translation' | 'ai';
+
+export interface KnowledgeRecord {
+  id: string;
+  kind: KnowledgeKind;
+  sentence: string;
+  translation?: string;
+  readings?: string;
+  romaji?: string;
+  targetLanguage?: string;
+  question?: string;
+  answer?: string;
+  createdAt: number;
+  fingerprint: string;
+}
+
+export interface QuizQuestion {
+  question: string;
+  options: [string, string, string, string];
+  answer: number;
+  explanation: string;
+}
+
 export interface ChatSession {
   id: string;
   title: string;

@@ -3,6 +3,8 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/Toast';
 import { ChatIndexPage } from './features/chat/ChatIndexPage';
 import { ChatPage } from './features/chat/ChatPage';
+import { MyPediaPage } from './features/mypedia/MyPediaPage';
+import { QuizPage } from './features/quiz/QuizPage';
 import { LibraryPage } from './features/library/LibraryPage';
 import { ReaderPage } from './features/reader/ReaderPage';
 import { LlmProvider } from './features/ai/LlmProvider';
@@ -43,6 +45,10 @@ function AppShell() {
         <ReaderPage bookId={route.bookId} />
       ) : route.name === 'chat' ? (
         route.sessionId === null ? <ChatIndexPage /> : <ChatPage sessionId={route.sessionId} />
+      ) : route.name === 'mypedia' ? (
+        <MyPediaPage />
+      ) : route.name === 'quiz' ? (
+        <QuizPage />
       ) : (
         <LibraryPage />
       )}

@@ -2,8 +2,9 @@ import { useRef, useState } from 'react';
 import { Icon } from './Icon';
 import { Modal } from './Modal';
 import { useI18n } from '../lib/i18n/useI18n';
-import { navigateToChatRoom } from '../lib/router';
+import { navigateToChatRoom, navigateToMyPedia, navigateToQuiz } from '../lib/router';
 import { useSettings } from '../features/settings/SettingsProvider';
+import { useLlm } from '../features/ai/LlmProvider';
 
 interface AppMenuProps {
   onAddBook?: () => void;
@@ -12,6 +13,7 @@ interface AppMenuProps {
 export function AppMenu({ onAddBook }: AppMenuProps) {
   const { t } = useI18n();
   const { settings, updateSettings, openSettings } = useSettings();
+  const llm = useLlm();
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
@@ -31,6 +33,16 @@ export function AppMenu({ onAddBook }: AppMenuProps) {
   const openChatRoom = (): void => {
     close();
     navigateToChatRoom();
+  };
+
+  const openMyPedia = (): void => {
+    close();
+    navigateToMyPedia();
+  };
+
+  const openQuiz = (): void => {
+    close();
+    navigateToQuiz();
   };
 
   const toggleTheme = (): void => {
@@ -81,6 +93,16 @@ export function AppMenu({ onAddBook }: AppMenuProps) {
               <Icon name="chat" />
               <span>{t('Chat room')}</span>
             </button>
+            <button type="button" className="app-menu__item" data-testid="menu-mypedia" onClick={openMyPedia}>
+              <Icon name="book" />
+              <span>{t('MyPedia')}</span>
+            </button>
+            {llm.canUse ? (
+              <button type="button" className="app-menu__item" data-testid="menu-quiz" onClick={openQuiz}>
+                <Icon name="quiz" />
+                <span>{t('Quiz')}</span>
+              </button>
+            ) : null}
             <button type="button" className="app-menu__item" data-testid="menu-settings" onClick={openSettingsPage}>
               <Icon name="gear" />
               <span>{t('Settings')}</span>

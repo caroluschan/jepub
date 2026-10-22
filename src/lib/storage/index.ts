@@ -7,6 +7,9 @@ export {
   importBookAtomic,
   openDb,
   pruneTranslations,
+  saveKnowledgeRecord,
+  listKnowledgeRecords,
+  deleteKnowledgeRecord,
   updateProgress,
 } from './db';
 export {

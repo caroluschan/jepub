@@ -5,6 +5,8 @@ import { useI18n } from '../../lib/i18n/useI18n';
 import { chatTitle, newChatSession, newMessage } from '../../lib/chat/session';
 import { buildSentencePrompt, readingsFromRuby } from '../../lib/llm/prompt';
 import { getByotProvider } from '../../lib/llm/byot';
+import { makeKnowledgeRecord } from '../../lib/knowledge/record';
+import { saveKnowledgeRecord } from '../../lib/storage/db';
 import type { ByotProviderId } from '../../lib/types';
 import { putChatSession } from '../../lib/storage/db';
 import { navigateToChat } from '../../lib/router';
@@ -62,6 +64,21 @@ export function AskAiSection({
       });
       setAnswer(result);
       setAskState('ready');
+      void saveKnowledgeRecord(
+        makeKnowledgeRecord(
+          {
+            kind: 'ai',
+            sentence,
+            question: prompt,
+            answer: result,
+            ...(readingsFromRuby(rubyHtml).length === 0
+              ? {}
+              : { readings: readingsFromRuby(rubyHtml) }),
+            ...(romaji === null ? {} : { romaji }),
+          },
+          result,
+        ),
+      ).catch(() => undefined);
     } catch (cause) {
       setAskState('error');
       setError(cause instanceof Error ? cause.message : t('AI model could not be loaded.'));

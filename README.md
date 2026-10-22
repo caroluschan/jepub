@@ -28,7 +28,7 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - JEPUB asks the browser for persistent storage, so your shelf survives ordinary browser restarts.
 
 **A single menu**
-- The library header has one menu for **Chat room**, **Settings**, **Add book**, and the light/dark theme.
+- The library header has one menu for **Chat room**, **MyPedia**, **Quiz**, **Settings**, **Add book**, and the light/dark theme.
 - **Chat room** lists saved conversations on this device; open any previous chat, start a new one, or delete old ones.
 - Saved conversations remain readable even when AI is Off or BYOT is offline.
 
@@ -63,6 +63,13 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - BYOT keeps the API key in this browser, fetches the provider's current model list when possible, and always allows a manually typed model ID when the catalog changes.
 - **Ask AI** and **Chat More** work the same in every mode; answers render sanitized Markdown and chat sessions stay in IndexedDB on this device.
 - BYOT needs a connection. The sentence-sheet AI button and chat composer are disabled while offline.
+
+**MyPedia and Quiz**
+- Add checked translations to **MyPedia** from the sentence panel. Ask AI answers are recorded automatically.
+- MyPedia lists saved translation and AI records, with per-record deletion.
+- When AI is enabled, summarize the knowledge base into a learning summary with strengths, gaps, and next steps.
+- Quiz picks a random MyPedia record and asks the AI for a four-option multiple-choice question, then shows the result and explanation.
+- Summaries and quizzes are unavailable when AI is Off; the quiz menu item is hidden without an AI service.
 
 **Local AI, only where it fits**
 - Uses a 4-bit Qwen3.5-0.8B model (about 645 MB). The model downloads once, only after an explicit warning and consent.
@@ -197,8 +204,9 @@ src/lib/furigana/    Kuroshiro, dictionary loader, queue, sanitizer
 src/lib/translate/   language list, providers, cache
 src/lib/llm/        capability gate, model worker, prompts
 src/lib/chat/       local chat session helpers
+src/lib/knowledge/  MyPedia prompts and record helpers
 src/lib/reader/     scroll behavior
-src/features/       library, reader, sentence panel, settings, AI, chat
+src/features/       library, reader, sentence panel, settings, AI, chat, MyPedia, quiz
 src/pwa/             service worker update and file handling
 scripts/             dictionary, icons, and sample EPUB generation
 tests/               unit and end-to-end tests

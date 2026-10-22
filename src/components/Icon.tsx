@@ -19,7 +19,8 @@ export type IconName =
   | 'bookmark-filled'
   | 'gear'
   | 'menu'
-  | 'chat';
+  | 'chat'
+  | 'quiz';
 
 interface IconProps {
   name: IconName;
@@ -80,6 +81,12 @@ const paths: Record<IconName, ReactNode> = {
     <>
       <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2 1.2-4.4A8.5 8.5 0 1 1 21 11.5Z" />
       <path d="M8 12h8M8 8.5h5" />
+    </>
+  ),
+  quiz: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9a2.5 2.5 0 1 1 4 2c-.9.7-1.5 1.2-1.5 2.5M12 17h.01" />
     </>
   ),
   gear: (

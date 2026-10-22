@@ -14,6 +14,9 @@ import {
   listBooks,
   openDb,
   pruneTranslations,
+  saveKnowledgeRecord,
+  listKnowledgeRecords,
+  deleteKnowledgeRecord,
   updateProgress,
 } from '../../src/lib/storage';
 
@@ -205,3 +208,23 @@ describe('storage', () => {
     });
   });
 });
+
+  it('DB-KNOWLEDGE saves, deduplicates, lists, and deletes records', async () => {
+    const record = {
+      id: 'knowledge-1',
+      kind: 'translation' as const,
+      sentence: '吾輩は猫である。',
+      translation: 'I am a cat.',
+      targetLanguage: 'en',
+      createdAt: 100,
+      fingerprint: 'translation-test',
+    };
+    await saveKnowledgeRecord(record);
+    await saveKnowledgeRecord({ ...record, id: 'knowledge-2', createdAt: 200 });
+    const records = await listKnowledgeRecords();
+    expect(records).toHaveLength(1);
+    expect(records[0]?.id).toBe('knowledge-1');
+
+    await deleteKnowledgeRecord('knowledge-1');
+    expect(await listKnowledgeRecords()).toEqual([]);
+  });

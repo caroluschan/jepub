@@ -15,6 +15,9 @@ import type { TranslationProvider } from '../../lib/types';
 import { useSettings } from '../settings/SettingsProvider';
 import { AskAiSection } from '../ai/AskAiSection';
 import { useSentenceDetails, type TranslationView } from './useSentenceDetails';
+import { makeKnowledgeRecord } from '../../lib/knowledge/record';
+import { saveKnowledgeRecord } from '../../lib/storage/db';
+import { readingsFromRuby } from '../../lib/llm/prompt';
 
 interface SentenceSheetProps {
   sentence: string;
@@ -126,6 +129,7 @@ export function SentenceSheet({ sentence, onClose, restoreFocus }: SentenceSheet
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const mountedRef = useRef(true);
   const [playing, setPlaying] = useState(false);
+  const [savingKnowledge, setSavingKnowledge] = useState(false);
   const {
     translation,
     rubyHtml,
@@ -187,6 +191,32 @@ export function SentenceSheet({ sentence, onClose, restoreFocus }: SentenceSheet
   };
 
   const provider = translation.status === 'ready' ? translation.provider : null;
+
+  const addToMyPedia = async (): Promise<void> => {
+    if (translation.status !== 'ready' || savingKnowledge) return;
+    setSavingKnowledge(true);
+    try {
+      const readings = readingsFromRuby(rubyHtml);
+      await saveKnowledgeRecord(
+        makeKnowledgeRecord(
+          {
+            kind: 'translation',
+            sentence,
+            translation: translation.text,
+            targetLanguage: settings.translationTarget,
+            ...(readings.length === 0 ? {} : { readings }),
+            ...(romaji === null ? {} : { romaji }),
+          },
+          `${translation.text}\u0000${settings.translationTarget}`,
+        ),
+      );
+      push(t('Added to MyPedia.'), { tone: 'success' });
+    } catch {
+      push(t('Could not add to MyPedia.'), { tone: 'error' });
+    } finally {
+      setSavingKnowledge(false);
+    }
+  };
 
   return (
     <Modal
@@ -268,6 +298,17 @@ export function SentenceSheet({ sentence, onClose, restoreFocus }: SentenceSheet
               onEnableOnline={enableOnline}
             />
           </div>
+          {translation.status === 'ready' ? (
+            <button
+              type="button"
+              className="button--text sentence-sheet__mypedia"
+              data-testid="add-to-mypedia"
+              disabled={savingKnowledge}
+              onClick={() => void addToMyPedia()}
+            >
+              {t('+ MyPedia')}
+            </button>
+          ) : null}
         </div>
 
         <AskAiSection

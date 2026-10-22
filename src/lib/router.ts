@@ -1,7 +1,9 @@
 export type Route =
   | { name: 'library' }
   | { name: 'reader'; bookId: string }
-  | { name: 'chat'; sessionId: string | null };
+  | { name: 'chat'; sessionId: string | null }
+  | { name: 'mypedia' }
+  | { name: 'quiz' };
 
 const LIBRARY: Route = { name: 'library' };
 
@@ -16,6 +18,9 @@ export function parseRoute(hash: string): Route | null {
 
   const path = hash.slice(1);
   const segments = path.split('/').filter((segment) => segment.length > 0);
+
+  if (segments[0] === 'mypedia') return { name: 'mypedia' };
+  if (segments[0] === 'quiz') return { name: 'quiz' };
 
   if (segments[0] === 'chat') {
     if (segments[1] === undefined) return { name: 'chat', sessionId: null };
@@ -54,4 +59,12 @@ export function navigateToChat(sessionId: string): void {
 
 export function navigateToChatRoom(): void {
   window.location.hash = '#/chat';
+}
+
+export function navigateToMyPedia(): void {
+  window.location.hash = '#/mypedia';
+}
+
+export function navigateToQuiz(): void {
+  window.location.hash = '#/quiz';
 }

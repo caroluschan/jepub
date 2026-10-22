@@ -154,9 +154,10 @@ describe('bookmarks', () => {
     });
 
     const database = await openDb();
-    expect(database.version).toBe(3);
+    expect(database.version).toBe(4);
     expect(database.objectStoreNames.contains('bookmarks')).toBe(true);
     expect(database.objectStoreNames.contains('chatSessions')).toBe(true);
+    expect(database.objectStoreNames.contains('knowledge')).toBe(true);
     expect(await database.get('books', 'legacy')).toEqual(legacyBook);
 
     await addBookmark(makeBookmark('after-upgrade', 'legacy', 500));

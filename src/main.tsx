@@ -12,6 +12,7 @@ import './styles/settings.css';
 import './styles/ai.css';
 import './styles/chat.css';
 import './styles/menu.css';
+import './styles/knowledge.css';
 
 const container = document.getElementById('root');
 if (container === null) {
