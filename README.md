@@ -1,10 +1,10 @@
 # JEPUB
 
-### A quiet Japanese EPUB reader for the web.
+### A quiet, AI-powered Japanese reading and study room for the web.
 
 [**Open JEPUB →**](https://caroluschan.github.io/jepub/) · [Features](#features) · [Add books](#add-books) · [Install](#install-as-an-app) · [Run locally](#run-locally)
 
-JEPUB is a small, monochrome reading room for Japanese books. It keeps your library on your device, puts readings above kanji, and lets you tap any sentence to see how it sounds, what it means, and hear it spoken aloud.
+JEPUB is a small, monochrome reading room for Japanese books. It keeps your library on your device, puts readings above kanji, and lets you tap any sentence to see how it sounds, what it means, and hear it spoken aloud. When you want to go deeper, an optional AI study companion can explain the grammar, remember what you learned, and quiz you on it.
 
 <p align="center">
   <img src="assets/readme/library.png" width="250" alt="JEPUB library with a book cover">
@@ -20,11 +20,18 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 
 ## Features
 
+**AI-powered learning**
+- **Ask AI** about any sentence for a grammar breakdown and natural translation.
+- Continue the conversation in a local **Chat room** with saved history.
+- **MyPedia** turns AI exchanges into concise learning summaries and lets you save checked translations as study records.
+- **Quiz** turns a random MyPedia record into an AI-generated multiple-choice question in your interface language.
+- Use **BYOT** with your own provider key or a gated **Local** model. Turn AI **Off** to hide the AI-only study tools.
+
 **A shelf that stays yours**
 - Import EPUB and MOBI files from your device, or drag and drop them onto the shelf. Open EPUB files from another app on supported browsers.
 - Add plain `.txt` files in UTF-8, UTF-16, or Shift_JIS.
 - Download public-domain works directly from Aozora Bunko.
-- Books, covers, chapters, reading positions, and translated sentences are stored locally in IndexedDB.
+- Books, covers, chapters, reading positions, translated sentences, chat sessions, and MyPedia records are stored locally in IndexedDB.
 - JEPUB asks the browser for persistent storage, so your shelf survives ordinary browser restarts.
 
 **A single menu**
@@ -57,15 +64,16 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Translations are cached per language, so a translated sentence can be revisited instantly, even offline.
 - Play or stop the sentence with a Japanese (`ja-JP`) voice.
 
-**AI, three ways**
+**AI-powered help, three ways**
 - Choose **Off**, **BYOT** (bring your own token), or **Local** in Settings.
 - **BYOT** calls the provider you choose directly: OpenAI, Anthropic, Google Gemini, OpenRouter, Groq, Mistral, DeepSeek, xAI, Together AI, Cerebras, Perplexity, Fireworks AI, Qwen/DashScope, or a custom OpenAI-compatible endpoint.
 - BYOT keeps the API key in this browser, fetches the provider's current model list when possible, and always allows a manually typed model ID when the catalog changes.
 - **Ask AI** and **Chat More** work the same in every mode; answers render sanitized Markdown and chat sessions stay in IndexedDB on this device.
+- AI answers are summarized before they enter MyPedia, so your knowledge base stays focused on learning points.
 - BYOT needs a connection. The sentence-sheet AI button and chat composer are disabled while offline.
 
 **MyPedia and Quiz**
-- Add checked translations to **MyPedia** from the sentence panel. Ask AI answers are recorded automatically.
+- Add checked translations to **MyPedia** from the sentence panel. Ask AI exchanges are summarized and recorded automatically.
 - MyPedia lists saved translation and AI records, with per-record deletion.
 - Every AI exchange is summarized by the AI before it is inserted into MyPedia, so the knowledge base contains learning points rather than full chat answers.
 - Quiz picks a random MyPedia record and asks the AI for a four-option multiple-choice question in the selected UI language, then shows the result and explanation.
@@ -129,6 +137,7 @@ The app itself works across modern browsers. Translation providers and installed
 - **Online translation is opt-in.** When enabled, the selected sentence is sent to MyMemory and the provider is labeled in the sentence panel. With online translation off, only on-device translation and cached results are used.
 - **Local AI is opt-in.** After consent, the model downloads from Hugging Face and runs on this device. Sentences and chat messages are not sent to a JEPUB server. Chat sessions stay in IndexedDB. You can revoke consent or remove the model in Settings.
 - **BYOT is your provider relationship.** Your API key is stored in this browser and sent directly to the provider you select. JEPUB does not proxy or store the key on a server. Use a restricted key and review your provider's data policy.
+- **AI learning summaries** are generated by the chosen AI and stored locally in MyPedia. The raw AI answer is not inserted—only the summarized learning points.
 - **Aozora imports** send the public Aozora URL through Jina Reader. Aozora works are public-domain texts.
 - **Speech** uses the operating system’s speech voices. Depending on the installed voice, the OS may use a local or cloud-backed voice.
 - **GitHub Pages** serves the app from a shared `github.io` origin. As with any project page, other pages on the same origin share browser storage permissions. Use a dedicated origin if you need stronger isolation.
@@ -191,6 +200,7 @@ The app is built for the project path `/jepub/`. If you fork it under a differen
 - DOMPurify for sanitized ruby markup
 - Chrome built-in Translator API and MyMemory for translation
 - Transformers.js and ONNX Runtime WebGPU for optional local AI
+- AI-generated learning summaries and multiple-choice quiz questions
 - Direct BYOT streaming to OpenAI-compatible, Anthropic, and Gemini APIs
 - Web Speech API for Japanese speech
 - Vitest and Playwright for tests
