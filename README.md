@@ -27,6 +27,11 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Books, covers, chapters, reading positions, and translated sentences are stored locally in IndexedDB.
 - JEPUB asks the browser for persistent storage, so your shelf survives ordinary browser restarts.
 
+**A single menu**
+- The library header has one menu for **Chat room**, **Settings**, **Add book**, and the light/dark theme.
+- **Chat room** lists saved conversations on this device; open any previous chat, start a new one, or delete old ones.
+- Saved conversations remain readable even when AI is Off or BYOT is offline.
+
 **A reader made for Japanese**
 - Kuroshiro furigana above kanji. Katakana readings by default, with a Hiragana option.
 - Vertical Japanese (`vertical-rl`) or horizontal layout.

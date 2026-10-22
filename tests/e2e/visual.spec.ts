@@ -3,6 +3,8 @@ import {
   gotoLibrary,
   importSample,
   installApiMocks,
+  openSettingsFromMenu,
+  toggleThemeFromMenu,
   openSentence,
   setSettingsBeforeLoad,
   waitForFurigana,
@@ -71,7 +73,7 @@ test('visual: library mobile dark', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await importSample(page);
   await page.getByTestId('back-button').click();
-  await page.getByTestId('theme-toggle').click();
+  await toggleThemeFromMenu(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await stabilize(page);
   await noBodyOverflow(page);
@@ -92,7 +94,7 @@ test('visual: library desktop dark', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await importSample(page);
   await page.getByTestId('back-button').click();
-  await page.getByTestId('theme-toggle').click();
+  await toggleThemeFromMenu(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await stabilize(page);
   await noBodyOverflow(page);
@@ -231,7 +233,7 @@ test('visual: narrow 320px layout has no body overflow', async ({ page }) => {
 test('visual: empty library dark', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await gotoLibrary(page);
-  await page.getByTestId('theme-toggle').click();
+  await toggleThemeFromMenu(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByTestId('empty-state')).toBeVisible();
   await stabilize(page);
@@ -251,7 +253,7 @@ test('visual: empty library', async ({ page }) => {
 test('visual: settings mobile light', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await stabilize(page);
   await noBodyOverflow(page);
   await page.screenshot({ path: `${QA_DIR}/settings-mobile-light.png` });
@@ -261,7 +263,7 @@ test('visual: settings mobile dark', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await setSettingsBeforeLoad(page, { theme: 'dark' });
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await stabilize(page);
   await noBodyOverflow(page);
@@ -271,7 +273,7 @@ test('visual: settings mobile dark', async ({ page }) => {
 test('visual: settings desktop light', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await stabilize(page);
   await noBodyOverflow(page);
   await page.screenshot({ path: `${QA_DIR}/settings-desktop-light.png` });
@@ -281,7 +283,7 @@ test('visual: settings desktop dark', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await setSettingsBeforeLoad(page, { theme: 'dark' });
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await stabilize(page);
   await noBodyOverflow(page);
@@ -292,7 +294,7 @@ test('visual: settings desktop dark', async ({ page }) => {
 test('visual: settings mobile lower', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await page.locator('.settings-page__body').evaluate((element) => {
     element.scrollTop = element.scrollHeight;
   });
@@ -304,7 +306,7 @@ test('visual: settings mobile lower', async ({ page }) => {
 test('visual: settings desktop lower', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await page.locator('.settings-page__body').evaluate((element) => {
     element.scrollTop = element.scrollHeight;
   });
@@ -316,7 +318,7 @@ test('visual: settings desktop lower', async ({ page }) => {
 test('visual: narrow 320px settings has no overflow', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await expect(page.getByTestId('settings-page')).toBeVisible();
   await noBodyOverflow(page);
   const bodyFits = await page.evaluate(() => {
@@ -330,7 +332,7 @@ test('visual: narrow 320px settings has no overflow', async ({ page }) => {
 test('visual: settings mobile Japanese', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await page.getByTestId('ui-language').selectOption('ja');
   await stabilize(page);
   await noBodyOverflow(page);

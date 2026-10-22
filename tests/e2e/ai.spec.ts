@@ -59,6 +59,8 @@ test('@ai-chat gate prompts for consent on a direct chat route', async ({ page }
   await installGpu(page, true);
   await setSettingsBeforeLoad(page, { aiMode: 'local' });
   await page.goto('/#/chat');
+  await expect(page.getByTestId('chat-index')).toBeVisible();
+  await page.locator('.chat-index__empty').getByRole('button', { name: 'New chat' }).click();
   await expect(page.getByTestId('chat-page')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Enable AI' })).toBeVisible();
   await page.getByRole('button', { name: 'Enable AI' }).click();
@@ -89,6 +91,8 @@ test('@ai-byot works without local WebGPU and disables online calls offline', as
   await expect(page.getByTestId('ai-offline-note')).toBeVisible();
 
   await page.goto('/#/chat');
+  await expect(page.getByTestId('chat-index')).toBeVisible();
+  await page.locator('.chat-index__empty').getByRole('button', { name: 'New chat' }).click();
   await expect(page.getByTestId('chat-page')).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Message' })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Send' })).toBeDisabled();

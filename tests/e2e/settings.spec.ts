@@ -2,14 +2,16 @@ import { expect, test } from '@playwright/test';
 import {
   gotoLibrary,
   importSample,
+  openAppMenu,
+  openSettingsFromMenu,
   setSettingsBeforeLoad,
   waitForReader,
 } from './helpers';
 
 test('@settings-page opens from the library and restores focus', async ({ page }) => {
   await gotoLibrary(page);
-  const trigger = page.getByTestId('library-settings-button');
-  await trigger.click();
+  const trigger = page.getByTestId('app-menu-button');
+  await openSettingsFromMenu(page);
 
   const settings = page.getByRole('dialog', { name: 'Settings' });
   await expect(settings).toBeVisible();
@@ -52,7 +54,7 @@ test('@settings-page opens from the reader without unmounting it', async ({ page
 
 test('@ui-language switches to Japanese, persists, and sets document lang', async ({ page }) => {
   await gotoLibrary(page);
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
 
   await page.getByTestId('ui-language').selectOption('ja');
   await expect(page.getByRole('heading', { name: '設定', exact: true })).toBeVisible();
@@ -60,20 +62,20 @@ test('@ui-language switches to Japanese, persists, and sets document lang', asyn
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
   await page.getByTestId('settings-close').click();
 
-  await expect(
-    page.locator('.library-header').getByRole('button', { name: '本を追加' }),
-  ).toBeVisible();
+  await openAppMenu(page);
+  await expect(page.getByTestId('menu-add-book')).toBeVisible();
+  await page.getByRole('button', { name: 'Close menu' }).click();
   await expect(page.getByText('日本語 EPUB リーダー')).toBeVisible();
 
   await page.reload();
   await expect(page.getByTestId('library-page')).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
-  await expect(
-    page.locator('.library-header').getByRole('button', { name: '本を追加' }),
-  ).toBeVisible();
+  await openAppMenu(page);
+  await expect(page.getByTestId('menu-add-book')).toBeVisible();
+  await page.getByRole('button', { name: 'Close menu' }).click();
   await expect(page.getByText('日本語 EPUB リーダー')).toBeVisible();
 
-  await page.getByTestId('library-settings-button').click();
+  await openSettingsFromMenu(page);
   await expect(page.getByTestId('ui-language')).toHaveValue('ja');
 });
 

@@ -279,3 +279,25 @@ export async function installAozoraMocks(
     });
   });
 }
+
+export async function openAppMenu(page: Page): Promise<void> {
+  await page.getByTestId('app-menu-button').click();
+  await expect(page.getByTestId('app-menu')).toBeVisible();
+}
+
+export async function openSettingsFromMenu(page: Page): Promise<void> {
+  await openAppMenu(page);
+  await page.getByTestId('menu-settings').click();
+  await expect(page.getByTestId('settings-page')).toBeVisible();
+}
+
+export async function toggleThemeFromMenu(page: Page): Promise<void> {
+  await openAppMenu(page);
+  await page.getByTestId('menu-theme').click();
+}
+
+export async function openAddBookFromMenu(page: Page): Promise<void> {
+  await openAppMenu(page);
+  await page.getByTestId('menu-add-book').click();
+  await expect(page.getByRole('dialog', { name: 'Add a book' })).toBeVisible();
+}

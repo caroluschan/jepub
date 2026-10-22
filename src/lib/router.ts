@@ -51,3 +51,7 @@ export function navigateToBook(id: string): void {
 export function navigateToChat(sessionId: string): void {
   window.location.hash = `#/chat/${encodeURIComponent(sessionId)}`;
 }
+
+export function navigateToChatRoom(): void {
+  window.location.hash = '#/chat';
+}

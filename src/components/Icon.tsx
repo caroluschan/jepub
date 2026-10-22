@@ -17,7 +17,9 @@ export type IconName =
   | 'share'
   | 'bookmark'
   | 'bookmark-filled'
-  | 'gear';
+  | 'gear'
+  | 'menu'
+  | 'chat';
 
 interface IconProps {
   name: IconName;
@@ -72,6 +74,13 @@ const paths: Record<IconName, ReactNode> = {
       d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.6L6 21V4.5Z"
       fill="currentColor"
     />
+  ),
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  chat: (
+    <>
+      <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2 1.2-4.4A8.5 8.5 0 1 1 21 11.5Z" />
+      <path d="M8 12h8M8 8.5h5" />
+    </>
   ),
   gear: (
     <>

@@ -186,30 +186,6 @@ export function ChatPage({ sessionId }: ChatPageProps) {
     );
   }
 
-  if (llm.mode === 'off') {
-    return (
-      <div className="chat-page chat-page--center">
-        <span className="label">{t('AI service')}</span>
-        <h1 className="chat-page__gate-title">{t('AI is off. Choose BYOT or Local in Settings.')}</h1>
-        <button type="button" className="button" onClick={() => openSettings()}>
-          {t('Open AI settings')}
-        </button>
-      </div>
-    );
-  }
-
-  if (isByot && !llm.byotConfigured) {
-    return (
-      <div className="chat-page chat-page--center">
-        <span className="label">{t('BYOT')}</span>
-        <h1 className="chat-page__gate-title">{t('Set up BYOT in Settings.')}</h1>
-        <button type="button" className="button" onClick={() => openSettings()}>
-          {t('Open AI settings')}
-        </button>
-      </div>
-    );
-  }
-
   if (notFound) {
     return (
       <div className="chat-page chat-page--center">
@@ -241,10 +217,67 @@ export function ChatPage({ sessionId }: ChatPageProps) {
         </div>
       </header>
 
-      {isLocal && !settings.llmConsent ? (
-        <div className="chat-page__gate">
-          <span className="label">{t('On-device AI')}</span>
-          <h2 className="chat-page__gate-title">{t('Before you use on-device AI')}</h2>
+      <main className="chat-page__body">
+        {session !== null && session.messages.length === 0 && !sending ? (
+          <div className="chat-page__empty">
+            <p>{t('No messages yet.')}</p>
+            <p>{t('Ask about Japanese grammar, vocabulary, or this book.')}</p>
+          </div>
+        ) : null}
+
+        {session?.messages.map((message) => (
+          <article
+            key={message.id}
+            className={`chat-message chat-message--${message.role}`}
+            data-testid={`chat-message-${message.role}`}
+          >
+            {message.role === 'assistant' ? (
+              <span className="label chat-message__label">{t('AI answer')}</span>
+            ) : null}
+            {message.role === 'assistant' ? (
+              <Markdown className="chat-message__content" source={message.content} />
+            ) : (
+              <div className="chat-message__content" dir="auto">
+                {message.content}
+              </div>
+            )}
+          </article>
+        ))}
+
+        {sending ? (
+          <article className="chat-message chat-message--assistant" aria-live="polite">
+            <span className="label chat-message__label">{t('AI answer')}</span>
+            <Markdown
+              className="chat-message__content"
+              source={streaming.length > 0 ? streaming : progressLabel ?? t('AI is thinking…')}
+            />
+          </article>
+        ) : null}
+        {sendError !== null ? (
+          <p className="chat-page__error" role="alert">
+            {sendError}
+          </p>
+        ) : null}
+        <div ref={endRef} />
+      </main>
+
+      {llm.mode === 'off' ? (
+        <div className="chat-page__composer-gate" data-testid="chat-composer-gate">
+          <p>{t('AI is off. Choose BYOT or Local in Settings.')}</p>
+          <button type="button" className="button" onClick={() => openSettings()}>
+            {t('Open AI settings')}
+          </button>
+        </div>
+      ) : isByot && !llm.byotConfigured ? (
+        <div className="chat-page__composer-gate" data-testid="chat-composer-gate">
+          <p>{t('Set up BYOT in Settings.')}</p>
+          <button type="button" className="button" onClick={() => openSettings()}>
+            {t('Open AI settings')}
+          </button>
+        </div>
+      ) : isLocal && !settings.llmConsent ? (
+        <div className="chat-page__composer-gate" data-testid="chat-composer-gate">
+          <p>{t('Before you use on-device AI')}</p>
           <p>{t('Small local model. It can make mistakes.')}</p>
           <button type="button" className="button" onClick={() => setConsentOpen(true)}>
             {t('Enable AI')}
@@ -257,93 +290,47 @@ export function ChatPage({ sessionId }: ChatPageProps) {
           ) : null}
         </div>
       ) : (
-        <>
-          <main className="chat-page__body">
-            {session !== null && session.messages.length === 0 && !sending ? (
-              <div className="chat-page__empty">
-                <p>{t('No messages yet.')}</p>
-                <p>{t('Ask about Japanese grammar, vocabulary, or this book.')}</p>
-              </div>
-            ) : null}
-
-            {session?.messages.map((message) => (
-              <article
-                key={message.id}
-                className={`chat-message chat-message--${message.role}`}
-                data-testid={`chat-message-${message.role}`}
-              >
-                {message.role === 'assistant' ? (
-                  <span className="label chat-message__label">{t('AI answer')}</span>
-                ) : null}
-                {message.role === 'assistant' ? (
-                  <Markdown className="chat-message__content" source={message.content} />
-                ) : (
-                  <div className="chat-message__content" dir="auto">
-                    {message.content}
-                  </div>
-                )}
-              </article>
-            ))}
-
-            {sending ? (
-              <article className="chat-message chat-message--assistant" aria-live="polite">
-                <span className="label chat-message__label">{t('AI answer')}</span>
-                <Markdown
-                  className="chat-message__content"
-                  source={streaming.length > 0 ? streaming : progressLabel ?? t('AI is thinking…')}
-                />
-              </article>
-            ) : null}
-            {sendError !== null ? (
-              <p className="chat-page__error" role="alert">
-                {sendError}
-              </p>
-            ) : null}
-            <div ref={endRef} />
-          </main>
-
-          <form
-            className="chat-composer"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void send();
-            }}
-          >
-            <label className="label" htmlFor="chat-input">
-              {t('Message')}
-            </label>
-            <div className="chat-composer__row">
-              <textarea
-                id="chat-input"
-                className="chat-composer__input"
-                rows={2}
-                value={input}
-                placeholder={t('Ask about Japanese grammar, vocabulary, or this book.')}
-                disabled={sending || offlineByot}
-                onChange={(event) => setInput(event.currentTarget.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    void send();
-                  }
-                }}
-              />
-              <button
-                type="submit"
-                className="button"
-                disabled={sending || offlineByot || input.trim().length === 0}
-              >
-                {t('Send')}
-              </button>
-            </div>
-            <p className="chat-page__note">{t('Your chat stays on this device.')}</p>
-            {offlineByot ? (
-              <p className="chat-page__note" data-testid="ai-offline-note">
-                {t('BYOT needs an internet connection.')}
-              </p>
-            ) : null}
-          </form>
-        </>
+        <form
+          className="chat-composer"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void send();
+          }}
+        >
+          <label className="label" htmlFor="chat-input">
+            {t('Message')}
+          </label>
+          <div className="chat-composer__row">
+            <textarea
+              id="chat-input"
+              className="chat-composer__input"
+              rows={2}
+              value={input}
+              placeholder={t('Ask about Japanese grammar, vocabulary, or this book.')}
+              disabled={sending || offlineByot}
+              onChange={(event) => setInput(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  void send();
+                }
+              }}
+            />
+            <button
+              type="submit"
+              className="button"
+              disabled={sending || offlineByot || input.trim().length === 0}
+            >
+              {t('Send')}
+            </button>
+          </div>
+          <p className="chat-page__note">{t('Your chat stays on this device.')}</p>
+          {offlineByot ? (
+            <p className="chat-page__note" data-testid="ai-offline-note">
+              {t('BYOT needs an internet connection.')}
+            </p>
+          ) : null}
+        </form>
       )}
 
       {historyOpen ? (

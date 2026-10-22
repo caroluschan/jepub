@@ -249,6 +249,11 @@ export const ENGLISH_SOURCES = [
   'Local model',
   'Set up BYOT in Settings.',
   'Open AI settings',
+  'Open menu',
+  'Menu',
+  'Close menu',
+  'Chat room',
+  'Loading chats…',
 ] as const;
 
 export type TranslationKey = (typeof ENGLISH_SOURCES)[number];
@@ -522,6 +527,13 @@ const ja: Dictionary = {
   'Set up BYOT in Settings.': 'Set up BYOT in Settings.',
   'Open AI settings': 'Open AI settings',
 
+  'Open menu': 'Open menu',
+  'Menu': 'Menu',
+  'Close menu': 'Close menu',
+  'Chat room': 'Chat room',
+
+  'Loading chats…': 'Loading chats…',
+
 };
 
 const zhCN: Dictionary = {
@@ -786,6 +798,13 @@ const zhCN: Dictionary = {
   'Local model': 'Local model',
   'Set up BYOT in Settings.': 'Set up BYOT in Settings.',
   'Open AI settings': 'Open AI settings',
+
+  'Open menu': 'Open menu',
+  'Menu': 'Menu',
+  'Close menu': 'Close menu',
+  'Chat room': 'Chat room',
+
+  'Loading chats…': 'Loading chats…',
 
 };
 
@@ -1052,6 +1071,13 @@ const zhTW: Dictionary = {
   'Set up BYOT in Settings.': 'Set up BYOT in Settings.',
   'Open AI settings': 'Open AI settings',
 
+  'Open menu': 'Open menu',
+  'Menu': 'Menu',
+  'Close menu': 'Close menu',
+  'Chat room': 'Chat room',
+
+  'Loading chats…': 'Loading chats…',
+
 };
 
 const ko: Dictionary = {
@@ -1316,6 +1342,13 @@ const ko: Dictionary = {
   'Local model': 'Local model',
   'Set up BYOT in Settings.': 'Set up BYOT in Settings.',
   'Open AI settings': 'Open AI settings',
+
+  'Open menu': 'Open menu',
+  'Menu': 'Menu',
+  'Close menu': 'Close menu',
+  'Chat room': 'Chat room',
+
+  'Loading chats…': 'Loading chats…',
 
 };
 
@@ -1582,6 +1615,13 @@ const es: Dictionary = {
   'Set up BYOT in Settings.': 'Set up BYOT in Settings.',
   'Open AI settings': 'Open AI settings',
 
+  'Open menu': 'Open menu',
+  'Menu': 'Menu',
+  'Close menu': 'Close menu',
+  'Chat room': 'Chat room',
+
+  'Loading chats…': 'Loading chats…',
+
 };
 
 const fr: Dictionary = {
@@ -1847,6 +1887,13 @@ const fr: Dictionary = {
   'Set up BYOT in Settings.': 'Set up BYOT in Settings.',
   'Open AI settings': 'Open AI settings',
 
+  'Open menu': 'Open menu',
+  'Menu': 'Menu',
+  'Close menu': 'Close menu',
+  'Chat room': 'Chat room',
+
+  'Loading chats…': 'Loading chats…',
+
 };
 
 const de: Dictionary = {
@@ -2111,6 +2158,13 @@ const de: Dictionary = {
   'Local model': 'Local model',
   'Set up BYOT in Settings.': 'Set up BYOT in Settings.',
   'Open AI settings': 'Open AI settings',
+
+  'Open menu': 'Open menu',
+  'Menu': 'Menu',
+  'Close menu': 'Close menu',
+  'Chat room': 'Chat room',
+
+  'Loading chats…': 'Loading chats…',
 
 };
 

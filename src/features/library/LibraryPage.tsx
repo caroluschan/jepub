@@ -1,11 +1,9 @@
 import { useRef, useState } from 'react';
-import { Icon } from '../../components/Icon';
-import { ThemeToggle } from '../../components/ThemeToggle';
+import { AppMenu } from '../../components/AppMenu';
 import { useToast } from '../../components/Toast';
 import { useI18n } from '../../lib/i18n/useI18n';
 import { deleteBook } from '../../lib/storage';
 import type { BookRecord } from '../../lib/types';
-import { useSettings } from '../settings/SettingsProvider';
 import { AddBookSheet } from './AddBookSheet';
 import { BookCard } from './BookCard';
 import { DeleteBookDialog } from './DeleteBookDialog';
@@ -37,7 +35,6 @@ export function LibraryPage() {
     useBookImport();
   const { push } = useToast();
   const { t } = useI18n();
-  const { openSettings } = useSettings();
   const epubInputRef = useRef<HTMLInputElement | null>(null);
   const textInputRef = useRef<HTMLInputElement | null>(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -113,20 +110,7 @@ export function LibraryPage() {
           <span className="wordmark__label">日本語 EPUB READER</span>
         </h1>
         <div className="library-header__actions">
-          <button
-            type="button"
-            className="icon-button library-settings-button"
-            aria-label={t('Settings')}
-            data-testid="library-settings-button"
-            onClick={(event) => openSettings(event.currentTarget)}
-          >
-            <Icon name="gear" />
-          </button>
-          <button type="button" className="button button--quiet add-button" onClick={openAddSheet}>
-            <Icon name="plus" size={18} />
-            <span className="add-button__label">{t('Add book')}</span>
-          </button>
-          <ThemeToggle />
+          <AppMenu onAddBook={openAddSheet} />
         </div>
       </header>
 

@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import {
   SAMPLE_EPUB,
   gotoLibrary,
+  openAddBookFromMenu,
   installAozoraMocks,
   waitForReader,
 } from './helpers';
@@ -59,7 +60,7 @@ test('@share-aozora shares the Aozora card URL instead of a file', async ({ page
   await mockNativeShare(page);
   await installAozoraMocks(page);
   await gotoLibrary(page);
-  await page.getByRole('button', { name: 'Add book', exact: true }).click();
+  await openAddBookFromMenu(page);
   await page.getByRole('tab', { name: 'Aozora' }).click();
   await page
     .getByPlaceholder('https://www.aozora.gr.jp/cards/.../card....html')

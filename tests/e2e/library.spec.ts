@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test';
-import { SAMPLE_EPUB, gotoLibrary, importSample, waitForReader } from './helpers';
+import {
+  SAMPLE_EPUB,
+  gotoLibrary,
+  importSample,
+  toggleThemeFromMenu,
+  waitForReader,
+} from './helpers';
 
 test('@sample-import adds the sample and opens the reader', async ({ page }) => {
   await importSample(page);
@@ -62,10 +68,10 @@ test('@delete removes a book and the removal persists', async ({ page }) => {
 
 test('@theme-library toggles and persists the theme', async ({ page }) => {
   await gotoLibrary(page);
-  await page.getByTestId('theme-toggle').click();
+  await toggleThemeFromMenu(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.getByTestId('theme-toggle').click();
+  await toggleThemeFromMenu(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });

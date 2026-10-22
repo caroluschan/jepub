@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/Toast';
+import { ChatIndexPage } from './features/chat/ChatIndexPage';
 import { ChatPage } from './features/chat/ChatPage';
 import { LibraryPage } from './features/library/LibraryPage';
 import { ReaderPage } from './features/reader/ReaderPage';
@@ -41,7 +42,7 @@ function AppShell() {
       {route.name === 'reader' ? (
         <ReaderPage bookId={route.bookId} />
       ) : route.name === 'chat' ? (
-        <ChatPage sessionId={route.sessionId} />
+        route.sessionId === null ? <ChatIndexPage /> : <ChatPage sessionId={route.sessionId} />
       ) : (
         <LibraryPage />
       )}

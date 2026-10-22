@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import {
   gotoLibrary,
+  openAddBookFromMenu,
   importSample,
   installAozoraMocks,
   waitForReader,
@@ -8,7 +9,7 @@ import {
 
 test('@add-sheet opens, switches between three sources, and closes', async ({ page }) => {
   await gotoLibrary(page);
-  await page.getByRole('button', { name: 'Add book', exact: true }).click();
+  await openAddBookFromMenu(page);
 
   const sheet = page.getByRole('dialog', { name: 'Add a book' });
   await expect(sheet).toBeVisible();
@@ -36,7 +37,7 @@ test('@add-sheet opens, switches between three sources, and closes', async ({ pa
 
 test('@txt-import imports a text file from the Text tab', async ({ page }) => {
   await gotoLibrary(page);
-  await page.getByRole('button', { name: 'Add book', exact: true }).click();
+  await openAddBookFromMenu(page);
   await page.getByRole('tab', { name: 'Text' }).click();
 
   await page.getByTestId('text-input').setInputFiles({
@@ -59,7 +60,7 @@ test('@txt-import imports a text file from the Text tab', async ({ page }) => {
 test('@aozora-import downloads a mocked card and renders its ruby text', async ({ page }) => {
   await installAozoraMocks(page);
   await gotoLibrary(page);
-  await page.getByRole('button', { name: 'Add book', exact: true }).click();
+  await openAddBookFromMenu(page);
   await page.getByRole('tab', { name: 'Aozora' }).click();
   await page
     .getByPlaceholder('https://www.aozora.gr.jp/cards/.../card....html')
@@ -84,7 +85,7 @@ test('@aozora-import downloads a mocked card and renders its ruby text', async (
 test('@aozora-invalid shows an inline error and adds no card', async ({ page }) => {
   await installAozoraMocks(page, { status: 404 });
   await gotoLibrary(page);
-  await page.getByRole('button', { name: 'Add book', exact: true }).click();
+  await openAddBookFromMenu(page);
   await page.getByRole('tab', { name: 'Aozora' }).click();
   await page
     .getByPlaceholder('https://www.aozora.gr.jp/cards/.../card....html')
