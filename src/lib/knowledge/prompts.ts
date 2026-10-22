@@ -1,4 +1,5 @@
 import type { KnowledgeRecord, QuizQuestion } from '../types';
+import type { UiLanguageCode } from '../i18n/languages';
 
 function recordText(record: KnowledgeRecord): string {
   const lines = [`Kind: ${record.kind}`, `Sentence: ${record.sentence}`];
@@ -30,13 +31,28 @@ export function parseKnowledgeSummary(raw: string): string | null {
   return summary;
 }
 
-export function buildQuizPrompt(record: KnowledgeRecord): string {
+const LANGUAGE_NAMES: Record<UiLanguageCode, string> = {
+  en: 'English',
+  ja: 'Japanese',
+  'zh-CN': 'Simplified Chinese',
+  'zh-TW': 'Traditional Chinese',
+  ko: 'Korean',
+  es: 'Spanish',
+  fr: 'French',
+  de: 'German',
+};
+
+export function buildQuizPrompt(
+  record: KnowledgeRecord,
+  language: UiLanguageCode,
+): string {
   return [
     'Create one multiple-choice quiz question for a Japanese learner using this study record:',
     '',
     recordText(record),
     '',
     'The question should test understanding of the Japanese sentence, its reading, grammar, or meaning.',
+    `Write the question, all four options, and the explanation in ${LANGUAGE_NAMES[language]}. Keep Japanese source text in Japanese.`,
     'Return ONLY valid JSON with exactly these keys:',
     '{"question":"...","options":["...","...","...","..."],"answer":0,"explanation":"..."}',
     'Rules: exactly 4 distinct options; answer is the zero-based index of the correct option; no Markdown fences.',

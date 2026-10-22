@@ -14,7 +14,7 @@ import { AiConsentDialog } from '../ai/AiConsentDialog';
 type QuizState = 'idle' | 'loading' | 'ready' | 'error';
 
 export function QuizPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { settings, updateSettings, openSettings } = useSettings();
   const llm = useLlm();
   const [records, setRecords] = useState<KnowledgeRecord[]>([]);
@@ -60,7 +60,7 @@ export function QuizPage() {
     currentIdRef.current = record.id;
     try {
       const raw = await llm.generate(
-        [newMessage('user', buildQuizPrompt(record))],
+        [newMessage('user', buildQuizPrompt(record, language))],
         () => undefined,
         450,
       );

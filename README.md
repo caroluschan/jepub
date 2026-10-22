@@ -68,7 +68,7 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Add checked translations to **MyPedia** from the sentence panel. Ask AI answers are recorded automatically.
 - MyPedia lists saved translation and AI records, with per-record deletion.
 - Every AI exchange is summarized by the AI before it is inserted into MyPedia, so the knowledge base contains learning points rather than full chat answers.
-- Quiz picks a random MyPedia record and asks the AI for a four-option multiple-choice question, then shows the result and explanation.
+- Quiz picks a random MyPedia record and asks the AI for a four-option multiple-choice question in the selected UI language, then shows the result and explanation.
 - Quizzes are unavailable when AI is Off; the quiz menu item is hidden without an AI service.
 
 **Local AI, only where it fits**

@@ -36,6 +36,7 @@ test('@quiz asks a generated multiple-choice question and shows the result', asy
     aiModel: 'test-model',
     aiBaseUrl: 'https://example.test/v1',
   });
+  let quizPrompt = '';
   const quiz = JSON.stringify({
     question: 'What does 猫 mean?',
     options: ['cat', 'dog', 'bird', 'fish'],
@@ -54,6 +55,7 @@ test('@quiz asks a generated multiple-choice question and shows the result', asy
       });
       return;
     }
+    quizPrompt = route.request().postData() ?? '';
     await route.fulfill({
       status: 200,
       contentType: 'text/event-stream',
@@ -77,6 +79,7 @@ test('@quiz asks a generated multiple-choice question and shows the result', asy
   await expect(page.getByText('Correct')).toBeVisible();
   await expect(page.getByText('猫 means cat.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Next question' })).toBeVisible();
+  expect(quizPrompt).toContain('in English');
 });
 
 test('@mypedia stores an AI summary instead of the raw answer', async ({ page }) => {

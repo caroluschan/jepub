@@ -23,9 +23,10 @@ describe('knowledge prompts', () => {
   });
 
   it('QUIZ-PROMPT asks for strict JSON', () => {
-    const prompt = buildQuizPrompt(record);
+    const prompt = buildQuizPrompt(record, 'ja');
     expect(prompt).toContain('Return ONLY valid JSON');
     expect(prompt).toContain('exactly 4 distinct options');
+    expect(prompt).toContain('in Japanese');
   });
 
   it('QUIZ-PARSE accepts fenced JSON and validates four options', () => {
