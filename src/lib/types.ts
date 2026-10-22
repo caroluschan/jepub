@@ -22,6 +22,7 @@ export interface BookRecord {
   author: string;
   language: string;
   cover: Blob | null;
+  coverDataUrl?: string | null;
   fileName: string;
   fileSize: number;
   fileHash: string;

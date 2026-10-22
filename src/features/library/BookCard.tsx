@@ -1,6 +1,5 @@
 import { Icon } from '../../components/Icon';
 import type { BookRecord } from '../../lib/types';
-import { getCoverUrl } from './coverUrls';
 
 export function bookPercent(book: BookRecord): number {
   if (book.chapterCount <= 0) return 0;
@@ -14,7 +13,7 @@ interface BookCardProps {
 }
 
 export function BookCard({ book, onDelete }: BookCardProps) {
-  const coverUrl = getCoverUrl(book.id, book.cover);
+  const coverUrl = book.coverDataUrl ?? null;
   const percent = bookPercent(book);
 
   return (

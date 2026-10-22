@@ -104,6 +104,7 @@ test('@cover-after-reader keeps the library cover alive after leaving the reader
 
   const cover = page.locator('.book-card__image');
   await expect(cover).toBeVisible();
+  await expect(cover).toHaveAttribute('src', /^data:image\//);
   await expect
     .poll(async () => cover.evaluate((image) => (image as HTMLImageElement).naturalWidth))
     .toBeGreaterThan(0);
@@ -125,7 +126,45 @@ test('@cover-after-reader keeps the library cover alive after leaving the reader
   await page.reload();
   const reloaded = page.locator('.book-card__image');
   await expect(reloaded).toBeVisible();
+  await expect(reloaded).toHaveAttribute('src', /^data:image\//);
   await expect
     .poll(async () => reloaded.evaluate((image) => (image as HTMLImageElement).naturalWidth))
+    .toBeGreaterThan(0);
+});
+
+test('@legacy-cover-migration replaces an existing blob-only cover with a data URL', async ({
+  page,
+}) => {
+  await importSample(page);
+  await page.getByTestId('back-button').click();
+
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('jepub');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('books', 'readwrite');
+      const store = transaction.objectStore('books');
+      const all = store.getAll();
+      all.onsuccess = () => {
+        for (const book of all.result) {
+          delete book.coverDataUrl;
+          store.put(book);
+        }
+      };
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    });
+    database.close();
+  });
+
+  await page.reload();
+  const cover = page.locator('.book-card__image');
+  await expect(cover).toBeVisible();
+  await expect(cover).toHaveAttribute('src', /^data:image\//);
+  await expect
+    .poll(async () => cover.evaluate((image) => (image as HTMLImageElement).naturalWidth))
     .toBeGreaterThan(0);
 });

@@ -20,6 +20,17 @@ export async function getBook(id: string): Promise<BookRecord | undefined> {
   return database.get('books', id);
 }
 
+export async function updateBookCoverDataUrl(id: string, coverDataUrl: string): Promise<void> {
+  const database = await openDb();
+  const transaction = database.transaction('books', 'readwrite');
+  const store = transaction.objectStore('books');
+  const book = await store.get(id);
+  if (book !== undefined) {
+    await store.put({ ...book, coverDataUrl });
+  }
+  await transaction.done;
+}
+
 export async function getBookFile(id: string): Promise<Blob | null> {
   const database = await openDb();
   const record = await database.get('files', id);

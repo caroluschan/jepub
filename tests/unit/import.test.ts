@@ -60,6 +60,7 @@ describe('importEpubFile', () => {
     expect(imported.book.chapterCount).toBe(1);
     expect(imported.book.source).toBe('file');
     expect(imported.book.cover).not.toBeNull();
+    expect(imported.book.coverDataUrl).toMatch(/^data:image\//u);
     expect(imported.book.progress).toEqual({ chapterIndex: 0, ratio: 0 });
     expect(imported.chapterSet.bookId).toBe(imported.book.id);
     expect(imported.chapterSet.chapters).toHaveLength(1);

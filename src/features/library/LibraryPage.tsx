@@ -6,7 +6,6 @@ import { deleteBook } from '../../lib/storage';
 import type { BookRecord } from '../../lib/types';
 import { AddBookSheet } from './AddBookSheet';
 import { BookCard } from './BookCard';
-import { releaseCoverUrl } from './coverUrls';
 import { DeleteBookDialog } from './DeleteBookDialog';
 import { EmptyState } from './EmptyState';
 import { DropOverlay, ImportOverlay } from './ImportDropzone';
@@ -65,7 +64,6 @@ export function LibraryPage() {
     setDeleting(true);
     try {
       await deleteBook(pendingDelete.id);
-      releaseCoverUrl(pendingDelete.id);
       setPendingDelete(null);
       await refresh();
       push('Book removed from this device.', { tone: 'default' });

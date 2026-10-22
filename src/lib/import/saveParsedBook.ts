@@ -1,4 +1,5 @@
 import { importBookAtomic } from '../storage';
+import { blobToDataUrl } from '../storage/cover';
 import type { BookRecord, ImportedBook, ParsedEpub } from '../types';
 
 export interface SaveParsedBookInput {
@@ -19,12 +20,17 @@ function requestPersistence(): void {
 /** Builds the library record and writes the book, file, chapter set, and assets atomically. */
 export async function saveParsedBook(input: SaveParsedBookInput): Promise<ImportedBook> {
   const { parsed, blob, fileName, source, fileHash } = input;
+  const coverDataUrl =
+    parsed.cover === null
+      ? null
+      : await blobToDataUrl(parsed.cover).catch(() => null);
   const book: BookRecord = {
     id: crypto.randomUUID(),
     title: parsed.title,
     author: parsed.author,
     language: parsed.language,
     cover: parsed.cover,
+    coverDataUrl,
     fileName,
     fileSize: blob.size,
     fileHash,
