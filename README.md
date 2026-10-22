@@ -56,7 +56,7 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Choose **Off**, **BYOT** (bring your own token), or **Local** in Settings.
 - **BYOT** calls the provider you choose directly: OpenAI, Anthropic, Google Gemini, OpenRouter, Groq, Mistral, DeepSeek, xAI, Together AI, Cerebras, Perplexity, Fireworks AI, Qwen/DashScope, or a custom OpenAI-compatible endpoint.
 - BYOT keeps the API key in this browser, fetches the provider's current model list when possible, and always allows a manually typed model ID when the catalog changes.
-- **Ask AI** and **Chat More** work the same in every mode; chat sessions stay in IndexedDB on this device.
+- **Ask AI** and **Chat More** work the same in every mode; answers render sanitized Markdown and chat sessions stay in IndexedDB on this device.
 - BYOT needs a connection. The sentence-sheet AI button and chat composer are disabled while offline.
 
 **Local AI, only where it fits**

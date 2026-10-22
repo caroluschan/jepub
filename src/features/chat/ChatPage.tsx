@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Icon } from '../../components/Icon';
+import { Markdown } from '../../components/Markdown';
 import { Modal } from '../../components/Modal';
 import { Spinner } from '../../components/Spinner';
 import { useToast } from '../../components/Toast';
@@ -274,20 +275,23 @@ export function ChatPage({ sessionId }: ChatPageProps) {
                 {message.role === 'assistant' ? (
                   <span className="label chat-message__label">{t('AI answer')}</span>
                 ) : null}
-                <div className="chat-message__content" dir="auto">
-                  {message.content}
-                </div>
+                {message.role === 'assistant' ? (
+                  <Markdown className="chat-message__content" source={message.content} />
+                ) : (
+                  <div className="chat-message__content" dir="auto">
+                    {message.content}
+                  </div>
+                )}
               </article>
             ))}
 
             {sending ? (
               <article className="chat-message chat-message--assistant" aria-live="polite">
                 <span className="label chat-message__label">{t('AI answer')}</span>
-                <div className="chat-message__content">
-                  {streaming.length > 0
-                    ? streaming
-                    : progressLabel ?? t('AI is thinking…')}
-                </div>
+                <Markdown
+                  className="chat-message__content"
+                  source={streaming.length > 0 ? streaming : progressLabel ?? t('AI is thinking…')}
+                />
               </article>
             ) : null}
             {sendError !== null ? (

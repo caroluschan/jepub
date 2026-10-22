@@ -62,7 +62,7 @@
   font-family: var(--font-english);
   font-size: 15px;
   line-height: 1.6;
-  white-space: pre-wrap;
+  white-space: normal;
   overflow-wrap: anywhere;
 }
 

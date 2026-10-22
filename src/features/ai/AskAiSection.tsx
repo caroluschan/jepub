@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Markdown } from '../../components/Markdown';
 import { useToast } from '../../components/Toast';
 import { useI18n } from '../../lib/i18n/useI18n';
 import { chatTitle, newChatSession, newMessage } from '../../lib/chat/session';
@@ -133,8 +134,8 @@ export function AskAiSection({
       ) : null}
 
       {answer.length > 0 ? (
-        <div className="sentence-sheet__ai-answer" dir="auto" aria-live="polite">
-          {answer}
+        <div className="sentence-sheet__ai-answer" aria-live="polite">
+          <Markdown source={answer} />
         </div>
       ) : null}
 

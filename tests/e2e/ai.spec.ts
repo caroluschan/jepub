@@ -122,8 +122,7 @@ test('@ai-byot streams from a custom OpenAI-compatible provider', async ({ page 
       contentType: 'text/event-stream',
       headers: { 'access-control-allow-origin': '*' },
       body: [
-        'data: {"choices":[{"delta":{"content":"BYOT "}}]}',
-        'data: {"choices":[{"delta":{"content":"answer."}}]}',
+        'data: {"choices":[{"delta":{"content":"## Grammar\\n\\n**BYOT** answer.\\n\\n- one\\n- two"}}]}',
         'data: [DONE]',
         '',
       ].join('\n\n'),
@@ -132,5 +131,8 @@ test('@ai-byot streams from a custom OpenAI-compatible provider', async ({ page 
   await importSample(page);
   await openSentence(page);
   await page.getByTestId('ask-ai-button').click();
-  await expect(page.locator('.sentence-sheet__ai-answer')).toContainText('BYOT answer.');
+  await expect(page.locator('.sentence-sheet__ai-answer')).toContainText('BYOT');
+  await expect(page.locator('.sentence-sheet__ai-answer h2')).toHaveText('Grammar');
+  await expect(page.locator('.sentence-sheet__ai-answer strong')).toHaveText('BYOT');
+  await expect(page.locator('.sentence-sheet__ai-answer li')).toHaveCount(2);
 });
