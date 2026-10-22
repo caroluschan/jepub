@@ -12,6 +12,10 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
   <img src="assets/readme/sentence.png" width="250" alt="Sentence panel with ruby, romaji, translation, and playback">
 </p>
 
+<p align="center">
+  <img src="assets/readme/settings.png" width="620" alt="JEPUB settings page with appearance, reading, translation, storage, and about sections">
+</p>
+
 <p align="center"><sub>Screenshots use the bundled public-domain sample book.</sub></p>
 
 ## Features
