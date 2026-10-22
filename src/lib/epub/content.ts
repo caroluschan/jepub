@@ -1,5 +1,6 @@
 import type { ChapterBlock } from '../types';
 import { segmentSentences } from '../text/segmentSentences';
+import { hasXmlParseError, stripXmlPrefix } from './xml';
 
 export interface ChapterContent {
   blocks: ChapterBlock[];
@@ -49,10 +50,11 @@ function tagName(element: Element): string {
 }
 
 function parseDocument(xhtml: string): Document {
+  const normalized = stripXmlPrefix(xhtml);
   const parser = new DOMParser();
-  const xml = parser.parseFromString(xhtml, 'application/xhtml+xml');
-  if (xml.getElementsByTagName('parsererror').length === 0) return xml;
-  return parser.parseFromString(xhtml, 'text/html');
+  const xml = parser.parseFromString(normalized, 'application/xhtml+xml');
+  if (!hasXmlParseError(xml)) return xml;
+  return parser.parseFromString(normalized, 'text/html');
 }
 
 function headingLevel(tag: string): 1 | 2 | 3 | 4 | 5 | 6 {

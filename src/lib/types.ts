@@ -29,7 +29,7 @@ export interface BookRecord {
   addedAt: number;
   lastOpenedAt: number | null;
   progress: BookProgress;
-  source: 'file' | 'sample' | 'handler' | 'drop';
+  source: 'file' | 'sample' | 'handler' | 'drop' | 'text' | 'aozora';
 }
 
 export interface TocEntry {

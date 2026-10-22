@@ -34,7 +34,7 @@ export function useLaunchQueue(): void {
           } catch (error) {
             if (error instanceof ImportDuplicateError) {
               opened.push(error.existing);
-              push('Already in your library.', { tone: 'default' });
+              push('This book is already in your library.', { tone: 'default' });
             } else {
               push(friendlyError(error), { tone: 'error' });
             }

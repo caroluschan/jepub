@@ -26,7 +26,7 @@ test('@sample-import adds the sample and opens the reader', async ({ page }) => 
 
 test('@file-import imports a chosen EPUB file', async ({ page }) => {
   await gotoLibrary(page);
-  await page.locator('input[type="file"]').setInputFiles(SAMPLE_EPUB);
+  await page.getByTestId('epub-input').setInputFiles(SAMPLE_EPUB);
   await waitForReader(page);
   await page.getByTestId('back-button').click();
   await expect(page.getByTestId('book-card')).toHaveCount(1);
@@ -34,7 +34,7 @@ test('@file-import imports a chosen EPUB file', async ({ page }) => {
 
 test('@corrupt shows a friendly error and adds no card', async ({ page }) => {
   await gotoLibrary(page);
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByTestId('epub-input').setInputFiles({
     name: 'broken.epub',
     mimeType: 'application/epub+zip',
     buffer: Buffer.from('this is not an epub archive'),

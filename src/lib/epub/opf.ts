@@ -1,6 +1,7 @@
 import { EpubParseError } from './errors';
 import { dirname, resolveZipPath } from './paths';
 import type { ManifestItem, OpfDocument, SpineEntry } from './types';
+import { hasXmlParseError, parseXmlDocument } from './xml';
 
 function elementsByLocalName(root: ParentNode, name: string): Element[] {
   return Array.from(root.querySelectorAll('*')).filter(
@@ -22,8 +23,8 @@ function findMetadata(doc: Document): Element | null {
 }
 
 export function parseOpf(xml: string, opfPath: string): OpfDocument {
-  const doc = new DOMParser().parseFromString(xml, 'application/xml');
-  if (doc.getElementsByTagName('parsererror').length > 0) {
+  const doc = parseXmlDocument(xml);
+  if (hasXmlParseError(doc)) {
     throw new EpubParseError(`Package document is not valid XML: ${opfPath}`);
   }
 

@@ -205,3 +205,64 @@ export async function spokenEntries(
     return scope.__spoken ?? [];
   });
 }
+
+export const AOZORA_CARD_MARKDOWN = `Title: 羅生門 (芥川 竜之介)
+
+URL Source: https://www.aozora.gr.jp/cards/000879/card127.html
+
+Markdown Content:
+## 図書カード：No.127
+
+作品名：羅生門
+作品名読み：らしょうもん
+著者名：[芥川 竜之介](https://www.aozora.gr.jp/index_pages/person879.html)
+
+https://www.aozora.gr.jp/cards/000879/files/127_15260.html
+`;
+
+export const AOZORA_FILE_HTML = `<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+  <meta name="DC.Title" content="羅生門">
+  <meta name="DC.Creator" content="芥川龍之介">
+</head>
+<body>
+  <div class="main_text">
+    ある日の暮方の事である。一人の<ruby><rb>下人</rb><rp>（</rp><rt>げにん</rt><rp>）</rp></ruby>が、<ruby><rb>羅生門</rb><rp>（</rp><rt>らしょうもん</rt><rp>）</rp></ruby>の下で雨やみを待っていた。
+  </div>
+</body>
+</html>`;
+
+interface AozoraMockOptions {
+  status?: number;
+}
+
+/** Intercepts Jina Reader and serves deterministic Aozora card/file payloads. */
+export async function installAozoraMocks(
+  page: Page,
+  options: AozoraMockOptions = {},
+): Promise<void> {
+  await page.route('https://r.jina.ai/**', async (route) => {
+    const request = route.request();
+    const cors = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'X-Return-Format',
+    };
+    if (request.method() === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers: cors });
+      return;
+    }
+    if (options.status !== undefined) {
+      await route.fulfill({ status: options.status, headers: cors, body: 'not found' });
+      return;
+    }
+    const target = request.url().slice('https://r.jina.ai/'.length);
+    const isFile = target.includes('/files/');
+    await route.fulfill({
+      status: 200,
+      headers: { ...cors, 'Content-Type': 'text/plain; charset=utf-8' },
+      body: isFile ? AOZORA_FILE_HTML : AOZORA_CARD_MARKDOWN,
+    });
+  });
+}

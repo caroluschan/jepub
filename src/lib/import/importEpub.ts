@@ -1,50 +1,17 @@
 import type { BookRecord, ImportedBook, ParsedEpub } from '../types';
 import { openEpub } from '../epub/openEpub';
-import { findBookByHash, importBookAtomic } from '../storage';
+import { findBookByHash } from '../storage';
+import { ImportDuplicateError, ImportError, ImportTooLargeError } from './errors';
+import { sha256Hex } from './hash';
+import { saveParsedBook } from './saveParsedBook';
+
+export { ImportDuplicateError, ImportError, ImportTooLargeError } from './errors';
 
 export const MAX_IMPORT_BYTES = 100 * 1024 * 1024;
-
-export class ImportError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ImportError';
-  }
-}
-
-export class ImportTooLargeError extends ImportError {
-  constructor(message = 'This EPUB is larger than the 100 MB import limit.') {
-    super(message);
-    this.name = 'ImportTooLargeError';
-  }
-}
-
-export class ImportDuplicateError extends ImportError {
-  readonly existing: BookRecord;
-
-  constructor(existing: BookRecord) {
-    super('This EPUB is already in your library.');
-    this.name = 'ImportDuplicateError';
-    this.existing = existing;
-  }
-}
 
 export interface ImportOptions {
   source: BookRecord['source'];
   onPhase?: (phase: string) => void;
-}
-
-function toHex(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let hex = '';
-  for (const byte of bytes) {
-    hex += byte.toString(16).padStart(2, '0');
-  }
-  return hex;
-}
-
-async function sha256(buffer: ArrayBuffer): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', buffer);
-  return toHex(digest);
 }
 
 function looksLikeEpub(file: File): boolean {
@@ -64,7 +31,7 @@ export async function importEpubFile(
 
   options.onPhase?.('hashing');
   const buffer = await file.arrayBuffer();
-  const fileHash = await sha256(buffer);
+  const fileHash = await sha256Hex(buffer);
 
   const existing = await findBookByHash(fileHash);
   if (existing !== null) {
@@ -84,50 +51,14 @@ export async function importEpubFile(
     throw new ImportError('This EPUB has no readable chapters.');
   }
 
-  const book: BookRecord = {
-    id: crypto.randomUUID(),
-    title: parsed.title,
-    author: parsed.author,
-    language: parsed.language,
-    cover: parsed.cover,
-    fileName: file.name,
-    fileSize: file.size,
-    fileHash,
-    chapterCount: parsed.chapters.length,
-    addedAt: Date.now(),
-    lastOpenedAt: null,
-    progress: { chapterIndex: 0, ratio: 0 },
-    source: options.source,
-  };
-
   options.onPhase?.('saving');
-  await importBookAtomic(
-    book,
-    new Blob([buffer], { type: 'application/epub+zip' }),
-    {
-      bookId: book.id,
-      version: 1,
-      chapters: parsed.chapters,
-      toc: parsed.toc,
-    },
-    parsed.assets,
-  );
-
-  if (typeof navigator !== 'undefined' && navigator.storage !== undefined) {
-    void navigator.storage.persist().catch((error: unknown) => {
-      console.warn('JEPUB: persistent storage was not granted.', error);
-    });
-  }
-
-  return {
-    book,
-    chapterSet: {
-      bookId: book.id,
-      version: 1,
-      chapters: parsed.chapters,
-      toc: parsed.toc,
-    },
-  };
+  return saveParsedBook({
+    parsed,
+    blob: new Blob([buffer], { type: 'application/epub+zip' }),
+    fileName: file.name,
+    source: options.source,
+    fileHash,
+  });
 }
 
 export async function importSample(): Promise<ImportedBook> {

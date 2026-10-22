@@ -8,6 +8,7 @@ import {
   splitHref,
 } from './paths';
 import type { ManifestItem, OpfDocument } from './types';
+import { hasXmlParseError, parseXmlDocument } from './xml';
 
 export interface TocParseInput {
   opf: OpfDocument;
@@ -155,8 +156,8 @@ export async function parseToc(input: TocParseInput): Promise<TocEntry[]> {
     if (xml === null) {
       throw new EpubParseError(`Navigation document is missing: ${navItem.path}`);
     }
-    const doc = new DOMParser().parseFromString(xml, 'application/xhtml+xml');
-    if (doc.getElementsByTagName('parsererror').length === 0) {
+    const doc = parseXmlDocument(xml, 'application/xhtml+xml');
+    if (!hasXmlParseError(doc)) {
       const entries = parseNavDocument(doc, navItem.path, indexLookup);
       if (entries.length > 0) return entries;
     }
@@ -166,8 +167,8 @@ export async function parseToc(input: TocParseInput): Promise<TocEntry[]> {
   if (ncxItem) {
     const xml = await getText(ncxItem.path);
     if (xml !== null) {
-      const doc = new DOMParser().parseFromString(xml, 'application/xml');
-      if (doc.getElementsByTagName('parsererror').length === 0) {
+      const doc = parseXmlDocument(xml);
+      if (!hasXmlParseError(doc)) {
         const entries = parseNcxDocument(doc, ncxItem.path, indexLookup);
         if (entries.length > 0) return entries;
       }

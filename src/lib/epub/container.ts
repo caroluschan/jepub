@@ -1,11 +1,14 @@
 import { EpubParseError } from './errors';
 import { decodeUriPart } from './paths';
+import { hasXmlParseError, parseXmlDocument } from './xml';
 
 export const CONTAINER_PATH = 'META-INF/container.xml';
 
 export function parseContainerXml(xml: string): string {
-  const doc = new DOMParser().parseFromString(xml, 'application/xml');
-  if (doc.getElementsByTagName('parsererror').length > 0) {
+  // Some valid EPUBs prepend a UTF-8 BOM to container.xml. parseXmlDocument
+  // strips a BOM/leading whitespace before the XML declaration.
+  const doc = parseXmlDocument(xml);
+  if (hasXmlParseError(doc)) {
     throw new EpubParseError('META-INF/container.xml is not valid XML.');
   }
 

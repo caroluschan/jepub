@@ -1,6 +1,6 @@
 import { Icon } from '../../components/Icon';
-import { useObjectUrl } from '../../components/useObjectUrl';
 import type { BookRecord } from '../../lib/types';
+import { getCoverUrl } from './coverUrls';
 
 export function bookPercent(book: BookRecord): number {
   if (book.chapterCount <= 0) return 0;
@@ -14,7 +14,7 @@ interface BookCardProps {
 }
 
 export function BookCard({ book, onDelete }: BookCardProps) {
-  const coverUrl = useObjectUrl(book.cover);
+  const coverUrl = getCoverUrl(book.id, book.cover);
   const percent = bookPercent(book);
 
   return (
@@ -36,9 +36,11 @@ export function BookCard({ book, onDelete }: BookCardProps) {
           <h3 className="book-card__title" lang="ja">
             {book.title}
           </h3>
-          <p className="book-card__author" lang="ja">
-            {book.author}
-          </p>
+          {book.author.length > 0 ? (
+            <p className="book-card__author" lang="ja">
+              {book.author}
+            </p>
+          ) : null}
           <div className="book-card__progress" aria-hidden="true">
             <span className="book-card__bar" style={{ width: `${percent}%` }} />
           </div>

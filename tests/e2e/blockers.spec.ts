@@ -35,7 +35,7 @@ test('@skip-link keeps the reader mounted and focuses the book text', async ({ p
 
 test('@zero-chapter rejects a cover-only EPUB and adds no card', async ({ page }) => {
   await gotoLibrary(page);
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByTestId('epub-input').setInputFiles({
     name: 'cover-only.epub',
     mimeType: 'application/epub+zip',
     buffer: await syntheticFileBuffer({
@@ -56,7 +56,7 @@ test('@furi-offscreen adds ruby only when the block approaches the viewport', as
     (_, index) => `<p>猫である。${index + 1}番目の段落。</p>`,
   ).join('');
   await gotoLibrary(page);
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByTestId('epub-input').setInputFiles({
     name: 'long.epub',
     mimeType: 'application/epub+zip',
     buffer: await syntheticFileBuffer({
@@ -187,7 +187,7 @@ test('@speech-play-error sentence play reports a playback failure', async ({ pag
 
 test('@short-final-progress treats a non-scrollable final chapter as complete', async ({ page }) => {
   await gotoLibrary(page);
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByTestId('epub-input').setInputFiles({
     name: 'short.epub',
     mimeType: 'application/epub+zip',
     buffer: await syntheticFileBuffer({
@@ -209,7 +209,7 @@ test('@translation-too-long shows the specific message instead of Retry', async 
   await installApiMocks(page, { translator: 'none' });
   await setSettingsBeforeLoad(page, { onlineTranslation: true });
   await gotoLibrary(page);
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByTestId('epub-input').setInputFiles({
     name: 'long-sentence.epub',
     mimeType: 'application/epub+zip',
     buffer: await syntheticFileBuffer({

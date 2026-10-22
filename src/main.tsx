@@ -5,6 +5,7 @@ import './styles/tokens.css';
 import './styles/global.css';
 import './styles/components.css';
 import './styles/library.css';
+import './styles/add-book.css';
 import './styles/reader.css';
 import './styles/sentence.css';
 

@@ -23,7 +23,7 @@ export function DropOverlay() {
     <div className="drop-overlay" aria-hidden="true">
       <div className="drop-overlay__frame">
         <p className="label">Add to library</p>
-        <p>Drop EPUB files to add</p>
+        <p>Drop EPUB or TXT files to add</p>
       </div>
     </div>
   );

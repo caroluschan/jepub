@@ -15,12 +15,12 @@ export function EmptyState({ onAdd, onSample, sampleLoading }: EmptyStateProps) 
       <p className="label">Your shelf</p>
       <h2 id="empty-title">Your shelf is empty.</h2>
       <p className="empty-state__copy">
-        Bring an EPUB onto this device. It stays here, in your browser, and works offline once
-        opened.
+        Bring an EPUB, a plain text file, or a work from Aozora Bunko onto this device. Books
+        stay here, in your browser, and work offline once opened.
       </p>
       <div className="empty-state__actions">
         <button type="button" className="button" onClick={onAdd}>
-          <Icon name="plus" size={18} /> Add your first EPUB
+          <Icon name="plus" size={18} /> Add a book
         </button>
         <button
           type="button"

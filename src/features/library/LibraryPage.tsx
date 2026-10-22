@@ -4,7 +4,9 @@ import { ThemeToggle } from '../../components/ThemeToggle';
 import { useToast } from '../../components/Toast';
 import { deleteBook } from '../../lib/storage';
 import type { BookRecord } from '../../lib/types';
+import { AddBookSheet } from './AddBookSheet';
 import { BookCard } from './BookCard';
+import { releaseCoverUrl } from './coverUrls';
 import { DeleteBookDialog } from './DeleteBookDialog';
 import { EmptyState } from './EmptyState';
 import { DropOverlay, ImportOverlay } from './ImportDropzone';
@@ -30,18 +32,30 @@ function LibrarySkeleton() {
 
 export function LibraryPage() {
   const { books, status, refresh } = useLibrary();
-  const { importing, importFiles, importDroppedFiles, importSampleBook } = useBookImport();
+  const { importing, importFiles, importDroppedFiles, importAozora, importSampleBook } =
+    useBookImport();
   const { push } = useToast();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const epubInputRef = useRef<HTMLInputElement | null>(null);
+  const textInputRef = useRef<HTMLInputElement | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
   const [dragDepth, setDragDepth] = useState(0);
   const [pendingDelete, setPendingDelete] = useState<BookRecord | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const openPicker = (): void => {
-    fileInputRef.current?.click();
+  const openAddSheet = (): void => {
+    setAddOpen(true);
+  };
+
+  const chooseEpub = (): void => {
+    epubInputRef.current?.click();
+  };
+
+  const chooseText = (): void => {
+    textInputRef.current?.click();
   };
 
   const handleFiles = (files: FileList | null): void => {
+    setAddOpen(false);
     if (files === null) return;
     importFiles(Array.from(files));
   };
@@ -51,6 +65,7 @@ export function LibraryPage() {
     setDeleting(true);
     try {
       await deleteBook(pendingDelete.id);
+      releaseCoverUrl(pendingDelete.id);
       setPendingDelete(null);
       await refresh();
       push('Book removed from this device.', { tone: 'default' });
@@ -96,9 +111,9 @@ export function LibraryPage() {
           <span className="wordmark__label">日本語 EPUB READER</span>
         </h1>
         <div className="library-header__actions">
-          <button type="button" className="button button--quiet add-button" onClick={openPicker}>
+          <button type="button" className="button button--quiet add-button" onClick={openAddSheet}>
             <Icon name="plus" size={18} />
-            <span>Add EPUB</span>
+            <span>Add book</span>
           </button>
           <ThemeToggle />
         </div>
@@ -132,7 +147,7 @@ export function LibraryPage() {
 
         {status === 'ready' && books.length === 0 ? (
           <EmptyState
-            onAdd={openPicker}
+            onAdd={openAddSheet}
             onSample={() => void importSampleBook()}
             sampleLoading={sampleLoading}
           />
@@ -168,11 +183,25 @@ export function LibraryPage() {
       </footer>
 
       <input
-        ref={fileInputRef}
+        ref={epubInputRef}
         className="visually-hidden"
         type="file"
         accept=".epub,application/epub+zip"
         aria-label="Choose EPUB files"
+        data-testid="epub-input"
+        multiple
+        onChange={(event) => {
+          handleFiles(event.currentTarget.files);
+          event.currentTarget.value = '';
+        }}
+      />
+      <input
+        ref={textInputRef}
+        className="visually-hidden"
+        type="file"
+        accept=".txt,text/plain"
+        aria-label="Choose text files"
+        data-testid="text-input"
         multiple
         onChange={(event) => {
           handleFiles(event.currentTarget.files);
@@ -182,6 +211,16 @@ export function LibraryPage() {
 
       {dragDepth > 0 ? <DropOverlay /> : null}
       {importing !== null ? <ImportOverlay importing={importing} /> : null}
+
+      {addOpen ? (
+        <AddBookSheet
+          onClose={() => setAddOpen(false)}
+          onChooseEpub={chooseEpub}
+          onChooseText={chooseText}
+          onAozora={importAozora}
+          importing={importing}
+        />
+      ) : null}
 
       {pendingDelete !== null ? (
         <DeleteBookDialog
