@@ -5,10 +5,9 @@ import {
   env,
 } from '@huggingface/transformers';
 import type { ChatMessage } from '../types';
+import { TUTOR_SYSTEM_PROMPT } from './prompt';
 
 const MODEL_ID = 'onnx-community/Qwen3.5-0.8B-ONNX';
-const SYSTEM_PROMPT =
-  'You are JEPUB\'s concise Japanese tutor. Explain Japanese grammar and meaning in English using the readings and romaji supplied by the reader. Never invent a kanji reading. If the supplied material is insufficient, say so briefly. Keep answers under 220 words.';
 
 interface ProgressInfo {
   status?: string;
@@ -123,7 +122,7 @@ async function generate(id: number, messages: ChatMessage[], maxTokens: number):
     if (tokenizer === null || model === null) throw new Error('The local model is not loaded.');
 
     const chat = [
-      { role: 'system' as const, content: SYSTEM_PROMPT },
+      { role: 'system' as const, content: TUTOR_SYSTEM_PROMPT },
       ...messages.slice(-12).map((message) => ({ role: message.role, content: message.content })),
     ];
     const templateOptions = {

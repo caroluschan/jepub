@@ -2,8 +2,23 @@ export type Theme = 'light' | 'dark';
 export type Orientation = 'horizontal' | 'vertical';
 export type FuriganaScript = 'katakana' | 'hiragana';
 
+export type AiMode = 'off' | 'byot' | 'local';
+export type ByotProviderId =
+  | 'openai'
+  | 'anthropic'
+  | 'google'
+  | 'openrouter'
+  | 'groq'
+  | 'mistral'
+  | 'custom';
+
 export interface Settings {
   llmConsent: boolean;
+  aiMode: AiMode;
+  aiProvider: ByotProviderId;
+  aiApiKey: string;
+  aiModel: string;
+  aiBaseUrl: string;
   theme: Theme;
   fontSize: number;
   orientation: Orientation;

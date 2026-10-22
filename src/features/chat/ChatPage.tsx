@@ -22,7 +22,7 @@ interface ChatPageProps {
 }
 
 export function ChatPage({ sessionId }: ChatPageProps) {
-  const { settings, updateSettings } = useSettings();
+  const { settings, updateSettings, openSettings } = useSettings();
   const { t } = useI18n();
   const { push } = useToast();
   const llm = useLlm();
@@ -36,6 +36,9 @@ export function ChatPage({ sessionId }: ChatPageProps) {
   const [consentOpen, setConsentOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [history, setHistory] = useState<ChatSession[]>([]);
+  const isLocal = llm.mode === 'local';
+  const isByot = llm.mode === 'byot';
+  const offlineByot = isByot && !llm.online;
   const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -91,7 +94,12 @@ export function ChatPage({ sessionId }: ChatPageProps) {
   const send = async (): Promise<void> => {
     const text = input.trim();
     if (text.length === 0 || sending || session === null) return;
-    if (!settings.llmConsent) {
+    if (offlineByot) return;
+    if (isByot && !llm.byotConfigured) {
+      openSettings();
+      return;
+    }
+    if (isLocal && !settings.llmConsent) {
       setConsentOpen(true);
       return;
     }
@@ -177,13 +185,25 @@ export function ChatPage({ sessionId }: ChatPageProps) {
     );
   }
 
-  if (!llm.support?.supported) {
+  if (llm.mode === 'off') {
     return (
       <div className="chat-page chat-page--center">
-        <span className="label">{t('On-device AI')}</span>
-        <h1 className="chat-page__gate-title">{t('AI is unavailable on this device.')}</h1>
-        <button type="button" className="button" onClick={navigateToLibrary}>
-          {t('Back')}
+        <span className="label">{t('AI service')}</span>
+        <h1 className="chat-page__gate-title">{t('AI is off. Choose BYOT or Local in Settings.')}</h1>
+        <button type="button" className="button" onClick={() => openSettings()}>
+          {t('Open AI settings')}
+        </button>
+      </div>
+    );
+  }
+
+  if (isByot && !llm.byotConfigured) {
+    return (
+      <div className="chat-page chat-page--center">
+        <span className="label">{t('BYOT')}</span>
+        <h1 className="chat-page__gate-title">{t('Set up BYOT in Settings.')}</h1>
+        <button type="button" className="button" onClick={() => openSettings()}>
+          {t('Open AI settings')}
         </button>
       </div>
     );
@@ -207,7 +227,7 @@ export function ChatPage({ sessionId }: ChatPageProps) {
           <Icon name="arrow-left" />
         </button>
         <div className="chat-page__heading">
-          <span className="label">{t('AI chat')}</span>
+          <span className="label">{isByot ? t('BYOT') : t('AI chat')}</span>
           <h1 className="chat-page__title">{session?.title ?? t('AI chat')}</h1>
         </div>
         <div className="chat-page__header-actions">
@@ -220,7 +240,7 @@ export function ChatPage({ sessionId }: ChatPageProps) {
         </div>
       </header>
 
-      {!settings.llmConsent ? (
+      {isLocal && !settings.llmConsent ? (
         <div className="chat-page__gate">
           <span className="label">{t('On-device AI')}</span>
           <h2 className="chat-page__gate-title">{t('Before you use on-device AI')}</h2>
@@ -295,7 +315,7 @@ export function ChatPage({ sessionId }: ChatPageProps) {
                 rows={2}
                 value={input}
                 placeholder={t('Ask about Japanese grammar, vocabulary, or this book.')}
-                disabled={sending}
+                disabled={sending || offlineByot}
                 onChange={(event) => setInput(event.currentTarget.value)}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' && !event.shiftKey) {
@@ -307,12 +327,17 @@ export function ChatPage({ sessionId }: ChatPageProps) {
               <button
                 type="submit"
                 className="button"
-                disabled={sending || input.trim().length === 0}
+                disabled={sending || offlineByot || input.trim().length === 0}
               >
                 {t('Send')}
               </button>
             </div>
             <p className="chat-page__note">{t('Your chat stays on this device.')}</p>
+            {offlineByot ? (
+              <p className="chat-page__note" data-testid="ai-offline-note">
+                {t('BYOT needs an internet connection.')}
+              </p>
+            ) : null}
           </form>
         </>
       )}

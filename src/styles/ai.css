@@ -92,3 +92,7 @@
 .settings-group__head + .settings-section .settings-row__note {
   max-width: 52ch;
 }
+
+.ai-byot + [data-testid="ai-local"] {
+  margin-top: var(--space-4);
+}

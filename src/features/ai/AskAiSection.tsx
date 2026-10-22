@@ -3,6 +3,8 @@ import { useToast } from '../../components/Toast';
 import { useI18n } from '../../lib/i18n/useI18n';
 import { chatTitle, newChatSession, newMessage } from '../../lib/chat/session';
 import { buildSentencePrompt, readingsFromRuby } from '../../lib/llm/prompt';
+import { getByotProvider } from '../../lib/llm/byot';
+import type { ByotProviderId } from '../../lib/types';
 import { putChatSession } from '../../lib/storage/db';
 import { navigateToChat } from '../../lib/router';
 import { useSettings } from '../settings/SettingsProvider';
@@ -44,7 +46,9 @@ export function AskAiSection({
     [romaji, rubyHtml, sentence, translation],
   );
 
-  if (llm.checking || llm.support === null || !llm.support.supported) return null;
+  if (llm.checking || !llm.canUse) return null;
+  const isLocal = llm.mode === 'local';
+  const isOfflineByot = llm.mode === 'byot' && !llm.online;
 
   const run = async (): Promise<void> => {
     setAskState('loading');
@@ -64,7 +68,8 @@ export function AskAiSection({
   };
 
   const ask = (): void => {
-    if (!settings.llmConsent) {
+    if (isOfflineByot) return;
+    if (isLocal && !settings.llmConsent) {
       setConsentOpen(true);
       return;
     }
@@ -101,8 +106,14 @@ export function AskAiSection({
   return (
     <div className="sentence-sheet__ai" data-testid="ask-ai">
       <div className="sentence-sheet__ai-head">
-        <span className="label">{t('On-device AI')}</span>
-        <span className="provider-chip">{t('Small local model. It can make mistakes.')}</span>
+        <span className="label">{isLocal ? t('On-device AI') : t('BYOT')}</span>
+        <span className="provider-chip">
+          {isLocal
+            ? t('Small local model. It can make mistakes.')
+            : t('Your key, sent directly to {provider}.', {
+                provider: getProviderLabel(settings.aiProvider),
+              })}
+        </span>
       </div>
 
       {progressLabel !== null && askState === 'loading' ? (
@@ -132,7 +143,7 @@ export function AskAiSection({
           type="button"
           className="button button--quiet"
           data-testid="ask-ai-button"
-          disabled={askState === 'loading'}
+          disabled={askState === 'loading' || isOfflineByot}
           onClick={ask}
         >
           {t('Ask AI')}
@@ -144,9 +155,19 @@ export function AskAiSection({
         ) : null}
       </div>
 
-      {consentOpen ? (
+      {isOfflineByot ? (
+        <p className="sentence-sheet__ai-progress" data-testid="ai-offline-note">
+          {t('BYOT needs an internet connection.')}
+        </p>
+      ) : null}
+
+      {isLocal && consentOpen ? (
         <AiConsentDialog onAccept={acceptConsent} onClose={() => setConsentOpen(false)} />
       ) : null}
     </div>
   );
+}
+
+function getProviderLabel(provider: ByotProviderId): string {
+  return getByotProvider(provider).label;
 }

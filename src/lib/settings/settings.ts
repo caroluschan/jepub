@@ -15,6 +15,11 @@ export const DEFAULT_SETTINGS: Settings = Object.freeze({
   furiganaScript: 'katakana',
   onlineTranslation: false,
   llmConsent: false,
+  aiMode: 'off',
+  aiProvider: 'openai',
+  aiApiKey: '',
+  aiModel: '',
+  aiBaseUrl: '',
   translationTarget: DEFAULT_TRANSLATION_TARGET,
   uiLanguage: DEFAULT_UI_LANGUAGE,
 });
@@ -48,6 +53,11 @@ function parseSettings(raw: unknown): Settings {
   const furiganaScript = raw['furiganaScript'];
   const onlineTranslation = raw['onlineTranslation'];
   const llmConsent = raw['llmConsent'];
+  const aiMode = raw['aiMode'];
+  const aiProvider = raw['aiProvider'];
+  const aiApiKey = raw['aiApiKey'];
+  const aiModel = raw['aiModel'];
+  const aiBaseUrl = raw['aiBaseUrl'];
   const translationTarget = raw['translationTarget'];
   const uiLanguage = raw['uiLanguage'];
 
@@ -71,6 +81,25 @@ function parseSettings(raw: unknown): Settings {
         ? onlineTranslation
         : DEFAULT_SETTINGS.onlineTranslation,
     llmConsent: typeof llmConsent === 'boolean' ? llmConsent : DEFAULT_SETTINGS.llmConsent,
+    aiMode:
+      aiMode === 'off' || aiMode === 'byot' || aiMode === 'local'
+        ? aiMode
+        : typeof llmConsent === 'boolean' && llmConsent
+          ? 'local'
+          : DEFAULT_SETTINGS.aiMode,
+    aiProvider:
+      aiProvider === 'openai' ||
+      aiProvider === 'anthropic' ||
+      aiProvider === 'google' ||
+      aiProvider === 'openrouter' ||
+      aiProvider === 'groq' ||
+      aiProvider === 'mistral' ||
+      aiProvider === 'custom'
+        ? aiProvider
+        : DEFAULT_SETTINGS.aiProvider,
+    aiApiKey: typeof aiApiKey === 'string' ? aiApiKey : '',
+    aiModel: typeof aiModel === 'string' ? aiModel : '',
+    aiBaseUrl: typeof aiBaseUrl === 'string' ? aiBaseUrl : '',
     translationTarget: isTranslationTarget(translationTarget)
       ? translationTarget
       : DEFAULT_TRANSLATION_TARGET,
@@ -114,6 +143,23 @@ function applyPatch(current: Settings, patch: Partial<Settings>): Settings {
   if (typeof patch.llmConsent === 'boolean') {
     next.llmConsent = patch.llmConsent;
   }
+  if (patch.aiMode === 'off' || patch.aiMode === 'byot' || patch.aiMode === 'local') {
+    next.aiMode = patch.aiMode;
+  }
+  if (
+    patch.aiProvider === 'openai' ||
+    patch.aiProvider === 'anthropic' ||
+    patch.aiProvider === 'google' ||
+    patch.aiProvider === 'openrouter' ||
+    patch.aiProvider === 'groq' ||
+    patch.aiProvider === 'mistral' ||
+    patch.aiProvider === 'custom'
+  ) {
+    next.aiProvider = patch.aiProvider;
+  }
+  if (typeof patch.aiApiKey === 'string') next.aiApiKey = patch.aiApiKey;
+  if (typeof patch.aiModel === 'string') next.aiModel = patch.aiModel;
+  if (typeof patch.aiBaseUrl === 'string') next.aiBaseUrl = patch.aiBaseUrl;
   if (isTranslationTarget(patch.translationTarget)) {
     next.translationTarget = patch.translationTarget;
   }

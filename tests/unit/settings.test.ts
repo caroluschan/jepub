@@ -20,13 +20,42 @@ describe('settings', () => {
       furiganaScript: 'katakana',
       onlineTranslation: false,
       llmConsent: false,
+      aiMode: 'off',
+      aiProvider: 'openai',
+      aiApiKey: '',
+      aiModel: '',
+      aiBaseUrl: '',
       translationTarget: 'en',
       uiLanguage: 'system',
     });
     expect(DEFAULT_SETTINGS.onlineTranslation).toBe(false);
     expect(DEFAULT_SETTINGS.llmConsent).toBe(false);
+    expect(DEFAULT_SETTINGS.aiMode).toBe('off');
     expect(DEFAULT_SETTINGS.furiganaScript).toBe('katakana');
     expect(DEFAULT_SETTINGS.translationTarget).toBe('en');
+  });
+
+  it('SET-AI preserves local consent as Local mode and persists BYOT fields', () => {
+    localStorage.setItem(
+      SETTINGS_KEY,
+      JSON.stringify({ llmConsent: true, aiMode: 'invalid', aiProvider: 'invalid' }),
+    );
+    expect(loadSettings().aiMode).toBe('local');
+    expect(loadSettings().aiProvider).toBe('openai');
+
+    saveSettings({
+      aiMode: 'byot',
+      aiProvider: 'openrouter',
+      aiApiKey: 'test-key',
+      aiModel: 'openai/gpt-4o-mini',
+      aiBaseUrl: 'https://example.test/v1',
+    });
+    const reloaded = loadSettings();
+    expect(reloaded.aiMode).toBe('byot');
+    expect(reloaded.aiProvider).toBe('openrouter');
+    expect(reloaded.aiApiKey).toBe('test-key');
+    expect(reloaded.aiModel).toBe('openai/gpt-4o-mini');
+    expect(reloaded.aiBaseUrl).toBe('https://example.test/v1');
   });
 
   it('SET-CORRUPT ignores invalid JSON and invalid individual keys', () => {

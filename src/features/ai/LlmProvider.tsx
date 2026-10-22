@@ -8,14 +8,22 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { ChatMessage, LlmSupport } from '../../lib/types';
+import type { AiMode, ChatMessage, LlmSupport } from '../../lib/types';
 import { detectLlmSupport } from '../../lib/llm/capabilities';
 import { LlmClient } from '../../lib/llm/client';
+import { byotBaseUrl, generateByot, getByotProvider } from '../../lib/llm/byot';
+import { useOnline } from '../../lib/network/useOnline';
+import { useSettings } from '../settings/SettingsProvider';
 
 export type LlmPhase = 'idle' | 'downloading' | 'loading' | 'ready' | 'error';
 
 interface LlmContextValue {
   support: LlmSupport | null;
+  localSupported: boolean;
+  mode: AiMode;
+  byotConfigured: boolean;
+  online: boolean;
+  canUse: boolean;
   checking: boolean;
   phase: LlmPhase;
   progress: number | null;
@@ -41,6 +49,8 @@ function unsupportedFallback(): LlmSupport {
 }
 
 export function LlmProvider({ children }: { children: ReactNode }) {
+  const { settings } = useSettings();
+  const online = useOnline();
   const [support, setSupport] = useState<LlmSupport | null>(null);
   const [checking, setChecking] = useState(true);
   const [phase, setPhase] = useState<LlmPhase>('idle');
@@ -50,6 +60,14 @@ export function LlmProvider({ children }: { children: ReactNode }) {
   const loadPromiseRef = useRef<Promise<void> | null>(null);
   const readyRef = useRef(false);
   const supportRef = useRef<LlmSupport | null>(null);
+  const localSupported = support?.supported === true;
+  const mode: AiMode = settings.aiMode === 'local' && !localSupported ? 'off' : settings.aiMode;
+  const provider = getByotProvider(settings.aiProvider);
+  const selectedModel = settings.aiModel.trim() || provider.defaultModel;
+  const hasKey = settings.aiApiKey.trim().length > 0 || settings.aiProvider === 'custom';
+  const hasBaseUrl = settings.aiProvider !== 'custom' || settings.aiBaseUrl.trim().length > 0;
+  const byotConfigured = selectedModel.length > 0 && hasKey && hasBaseUrl;
+  const canUse = mode === 'local' ? localSupported : mode === 'byot' ? byotConfigured : false;
 
   useEffect(() => {
     let active = true;
@@ -122,12 +140,33 @@ export function LlmProvider({ children }: { children: ReactNode }) {
 
   const generate = useCallback(
     async (messages: ChatMessage[], onToken: (token: string) => void): Promise<string> => {
+      if (mode === 'byot') {
+        if (!online) throw new Error('BYOT needs an internet connection.');
+        if (!byotConfigured) throw new Error('Set up BYOT in AI settings first.');
+        byotBaseUrl({
+          provider: settings.aiProvider,
+          apiKey: settings.aiApiKey,
+          model: selectedModel,
+          baseUrl: settings.aiBaseUrl,
+        });
+        return generateByot(
+          {
+            provider: settings.aiProvider,
+            apiKey: settings.aiApiKey,
+            model: selectedModel,
+            baseUrl: settings.aiBaseUrl,
+          },
+          messages,
+          onToken,
+        );
+      }
+      if (mode !== 'local') throw new Error('AI is turned off.');
       await ensureReady();
       const client = clientRef.current;
       if (client === null) throw new Error('The local AI model is not available.');
       return client.generate(messages, onToken);
     },
-    [ensureReady],
+    [byotConfigured, ensureReady, mode, online, selectedModel, settings.aiApiKey, settings.aiBaseUrl, settings.aiProvider],
   );
 
   const resetModel = useCallback(async (): Promise<void> => {
@@ -142,6 +181,11 @@ export function LlmProvider({ children }: { children: ReactNode }) {
   const value = useMemo<LlmContextValue>(
     () => ({
       support,
+      localSupported,
+      mode,
+      byotConfigured,
+      online,
+      canUse,
       checking,
       phase,
       progress,
@@ -150,7 +194,7 @@ export function LlmProvider({ children }: { children: ReactNode }) {
       generate,
       resetModel,
     }),
-    [checking, ensureReady, error, generate, phase, progress, resetModel, support],
+    [byotConfigured, canUse, checking, ensureReady, error, generate, localSupported, mode, online, phase, progress, resetModel, support],
   );
 
   return <LlmContext.Provider value={value}>{children}</LlmContext.Provider>;

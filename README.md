@@ -52,11 +52,16 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Translations are cached per language, so a translated sentence can be revisited instantly, even offline.
 - Play or stop the sentence with a Japanese (`ja-JP`) voice.
 
+**AI, three ways**
+- Choose **Off**, **BYOT** (bring your own token), or **Local** in Settings.
+- **BYOT** calls the provider you choose directly: OpenAI, Anthropic, Google Gemini, OpenRouter, Groq, Mistral, or a custom OpenAI-compatible endpoint.
+- BYOT keeps the API key in this browser, fetches the provider's current model list when possible, and always allows a manually typed model ID when the catalog changes.
+- **Ask AI** and **Chat More** work the same in every mode; chat sessions stay in IndexedDB on this device.
+- BYOT needs a connection. The sentence-sheet AI button and chat composer are disabled while offline.
+
 **Local AI, only where it fits**
-- On supported devices, **Ask AI** explains grammar and meaning locally in the sentence panel.
-- **Chat More** opens a local chat; sessions are kept in IndexedDB on this device.
 - Uses a 4-bit Qwen3.5-0.8B model (about 645 MB). The model downloads once, only after an explicit warning and consent.
-- Requires WebGPU, iOS/iPadOS 26+, Android 12+, sufficient GPU storage-buffer limits, and free storage. On devices that do not meet the gate, every AI control is hidden.
+- Requires WebGPU, iOS/iPadOS 26+, Android 12+, sufficient GPU storage-buffer limits, and free storage. On devices that do not meet the gate, the Local option is not offered.
 - This is a small local model: it can be slow and make mistakes. It is not a replacement for a teacher.
 
 **Listen**
@@ -93,16 +98,16 @@ Once installed, the app opens without browser chrome and the dictionary is prepa
 
 Safari on iPhone does not expose an on-device translation API to websites or home-screen PWAs. The 39-language selector still works there, but translations use **MyMemory online** when you enable the online fallback.
 
-Local AI is a separate, optional path. On iOS/iPadOS 26+ devices with WebGPU, enough GPU memory, and free storage, JEPUB can download and run the small Qwen model entirely on-device. Older devices keep the normal translation behavior and do not show AI controls.
+BYOT works on any iPhone with an internet connection and a provider API key. Local AI is a separate, optional path: on iOS/iPadOS 26+ devices with WebGPU, enough GPU memory, and free storage, JEPUB can download and run the small Qwen model entirely on-device. Older devices, including the base iPhone 15, do not get the Local option, but can still use BYOT.
 
 ## Browser support
 
-| Browser | Library & reader | On-device translation | Local AI | Online fallback |
-|---|---|---|---|---|
-| Chrome / Edge desktop | Yes | Yes, 39 language packs | WebGPU, 645 MB opt-in | Optional |
-| Chrome Android | Yes | Not available from the web API | Android 12+, WebGPU, buffer/storage gate | Optional |
-| Safari / iOS Safari | Yes | Not available from the web API | iOS/iPadOS 26+, WebGPU, buffer/storage gate | Optional |
-| Firefox | Yes | Not available from the web API | Not currently | Optional |
+| Browser | Library & reader | On-device translation | BYOT | Local AI | Online fallback |
+|---|---|---|---|---|---|
+| Chrome / Edge desktop | Yes | Yes, 39 language packs | Yes | WebGPU, 645 MB opt-in | Optional |
+| Chrome Android | Yes | Not available from the web API | Yes | Android 12+, WebGPU, buffer/storage gate | Optional |
+| Safari / iOS Safari | Yes | Not available from the web API | Yes | iOS/iPadOS 26+, WebGPU, buffer/storage gate | Optional |
+| Firefox | Yes | Not available from the web API | Yes | Not currently | Optional |
 
 The app itself works across modern browsers. Translation providers and installed speech voices vary by device.
 
@@ -111,6 +116,7 @@ The app itself works across modern browsers. Translation providers and installed
 - **No account, no analytics, no JEPUB server.** Your books stay in your browser’s storage.
 - **Online translation is opt-in.** When enabled, the selected sentence is sent to MyMemory and the provider is labeled in the sentence panel. With online translation off, only on-device translation and cached results are used.
 - **Local AI is opt-in.** After consent, the model downloads from Hugging Face and runs on this device. Sentences and chat messages are not sent to a JEPUB server. Chat sessions stay in IndexedDB. You can revoke consent or remove the model in Settings.
+- **BYOT is your provider relationship.** Your API key is stored in this browser and sent directly to the provider you select. JEPUB does not proxy or store the key on a server. Use a restricted key and review your provider's data policy.
 - **Aozora imports** send the public Aozora URL through Jina Reader. Aozora works are public-domain texts.
 - **Speech** uses the operating system’s speech voices. Depending on the installed voice, the OS may use a local or cloud-backed voice.
 - **GitHub Pages** serves the app from a shared `github.io` origin. As with any project page, other pages on the same origin share browser storage permissions. Use a dedicated origin if you need stronger isolation.
@@ -173,6 +179,7 @@ The app is built for the project path `/jepub/`. If you fork it under a differen
 - DOMPurify for sanitized ruby markup
 - Chrome built-in Translator API and MyMemory for translation
 - Transformers.js and ONNX Runtime WebGPU for optional local AI
+- Direct BYOT streaming to OpenAI-compatible, Anthropic, and Gemini APIs
 - Web Speech API for Japanese speech
 - Vitest and Playwright for tests
 
