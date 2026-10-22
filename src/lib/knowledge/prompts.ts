@@ -7,21 +7,27 @@ function recordText(record: KnowledgeRecord): string {
   if (record.translation !== undefined) lines.push(`Translation: ${record.translation}`);
   if (record.question !== undefined) lines.push(`Question: ${record.question}`);
   if (record.answer !== undefined) lines.push(`Answer: ${record.answer}`);
+  if (record.summary !== undefined) lines.push(`Summary: ${record.summary}`);
   return lines.join('\n').slice(0, 1200);
 }
 
-export function buildLearningSummaryPrompt(records: readonly KnowledgeRecord[]): string {
-  const selected = records.slice(0, 25);
+export function buildKnowledgeSummaryPrompt(question: string, answer: string): string {
   return [
-    'You are helping a Japanese learner review their own study records.',
-    'Write a concise learning summary in Markdown with three short sections:',
-    '1. What they have studied',
-    '2. Strengths and recurring gaps',
-    '3. Three concrete next study steps',
-    'Use only the records below. Do not invent facts. Keep it under 350 words.',
+    'Extract only the durable Japanese-learning knowledge from this AI exchange.',
+    'Write 1–3 concise Markdown bullet points covering what the learner should remember.',
+    'Do not repeat the full answer, small talk, or process description.',
+    'If the exchange contains no durable learning, reply exactly NONE.',
     '',
-    ...selected.map((record, index) => `Record ${index + 1}\n${recordText(record)}`),
-  ].join('\n\n');
+    `Learner question:\n${question.slice(0, 1200)}`,
+    '',
+    `AI answer:\n${answer.slice(0, 2400)}`,
+  ].join('\n');
+}
+
+export function parseKnowledgeSummary(raw: string): string | null {
+  const summary = raw.trim();
+  if (summary.length === 0 || /^none[.!]?$/iu.test(summary)) return null;
+  return summary;
 }
 
 export function buildQuizPrompt(record: KnowledgeRecord): string {

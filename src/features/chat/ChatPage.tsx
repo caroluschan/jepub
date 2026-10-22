@@ -6,11 +6,14 @@ import { Spinner } from '../../components/Spinner';
 import { useToast } from '../../components/Toast';
 import { useI18n } from '../../lib/i18n/useI18n';
 import { chatTitle, newChatSession, newMessage } from '../../lib/chat/session';
+import { makeKnowledgeRecord } from '../../lib/knowledge/record';
+import { summarizeForKnowledge } from '../../lib/knowledge/summarize';
 import {
   deleteChatSession,
   getChatSession,
   listChatSessions,
   putChatSession,
+  saveKnowledgeRecord,
 } from '../../lib/storage/db';
 import type { ChatSession } from '../../lib/types';
 import { navigateToChat, navigateToLibrary } from '../../lib/router';
@@ -130,6 +133,19 @@ export function ChatPage({ sessionId }: ChatPageProps) {
       };
       setSession(withAnswer);
       await putChatSession(withAnswer);
+      try {
+        const summary = await summarizeForKnowledge(llm.generate, text, answer);
+        if (summary !== null) {
+          await saveKnowledgeRecord(
+            makeKnowledgeRecord(
+              { kind: 'ai', sentence: text, question: text, summary },
+              summary,
+            ),
+          );
+        }
+      } catch {
+        // A failed summary must not discard the chat answer.
+      }
     } catch (cause) {
       setSendError(cause instanceof Error ? cause.message : t('AI model could not be loaded.'));
     } finally {

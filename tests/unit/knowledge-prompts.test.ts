@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildQuizPrompt, buildLearningSummaryPrompt, parseQuizQuestion } from '../../src/lib/knowledge/prompts';
+import { buildKnowledgeSummaryPrompt, buildQuizPrompt, parseKnowledgeSummary, parseQuizQuestion } from '../../src/lib/knowledge/prompts';
 import type { KnowledgeRecord } from '../../src/lib/types';
 
 const record: KnowledgeRecord = {
@@ -13,11 +13,13 @@ const record: KnowledgeRecord = {
 };
 
 describe('knowledge prompts', () => {
-  it('KB-PROMPT includes records in a summary request', () => {
-    const prompt = buildLearningSummaryPrompt([record]);
-    expect(prompt).toContain('吾輩は猫である。');
-    expect(prompt).toContain('I am a cat.');
-    expect(prompt).toContain('Three concrete next study steps');
+  it('KB-PROMPT asks for durable learning bullets and supports NONE', () => {
+    const prompt = buildKnowledgeSummaryPrompt('Explain this sentence.', 'It means I am a cat.');
+    expect(prompt).toContain('durable Japanese-learning knowledge');
+    expect(prompt).toContain('Explain this sentence.');
+    expect(prompt).toContain('It means I am a cat.');
+    expect(parseKnowledgeSummary('NONE')).toBeNull();
+    expect(parseKnowledgeSummary('- 猫 means cat.')).toBe('- 猫 means cat.');
   });
 
   it('QUIZ-PROMPT asks for strict JSON', () => {

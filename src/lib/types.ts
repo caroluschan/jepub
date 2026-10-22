@@ -154,6 +154,7 @@ export interface KnowledgeRecord {
   targetLanguage?: string;
   question?: string;
   answer?: string;
+  summary?: string;
   createdAt: number;
   fingerprint: string;
 }

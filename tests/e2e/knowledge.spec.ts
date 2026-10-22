@@ -79,7 +79,7 @@ test('@quiz asks a generated multiple-choice question and shows the result', asy
   await expect(page.getByRole('button', { name: 'Next question' })).toBeVisible();
 });
 
-test('@mypedia summarizes learning when AI is available', async ({ page }) => {
+test('@mypedia stores an AI summary instead of the raw answer', async ({ page }) => {
   await installApiMocks(page, { translator: 'available', translation: 'I am a cat.' });
   await setSettingsBeforeLoad(page, {
     aiMode: 'byot',
@@ -100,25 +100,28 @@ test('@mypedia summarizes learning when AI is available', async ({ page }) => {
       });
       return;
     }
+    const body = route.request().postData() ?? '';
+    const content = body.includes('durable Japanese-learning knowledge')
+      ? '- **吾輩** means “I” in this literary context.'
+      : 'The full raw AI answer should not be inserted.';
     await route.fulfill({
       status: 200,
       contentType: 'text/event-stream',
       headers: { 'access-control-allow-origin': '*' },
-      body: `data: ${JSON.stringify({
-        choices: [{ delta: { content: '## Progress\n\nYou have studied **I am a cat.**' } }],
-      })}\n\ndata: [DONE]\n\n`,
+      body: `data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\ndata: [DONE]\n\n`,
     });
   });
 
   await importSample(page);
   await openSentence(page);
-  await page.getByTestId('add-to-mypedia').click();
+  await page.getByTestId('ask-ai-button').click();
+  await expect(page.locator('.sentence-sheet__ai-answer')).toContainText('raw AI answer');
   await page.getByTestId('sentence-close').click();
   await page.getByTestId('back-button').click();
   await openAppMenu(page);
   await page.getByTestId('menu-mypedia').click();
 
-  await page.getByTestId('summarize-learning').click();
-  await expect(page.locator('.mypedia-summary h2')).toHaveText('Progress');
-  await expect(page.getByText('You have studied')).toBeVisible();
+  await expect(page.getByTestId('mypedia-record')).toHaveCount(1);
+  await expect(page.getByTestId('mypedia-record')).toContainText('吾輩 means');
+  await expect(page.getByTestId('mypedia-record')).not.toContainText('full raw AI answer');
 });

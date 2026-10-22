@@ -6,6 +6,7 @@ import { chatTitle, newChatSession, newMessage } from '../../lib/chat/session';
 import { buildSentencePrompt, readingsFromRuby } from '../../lib/llm/prompt';
 import { getByotProvider } from '../../lib/llm/byot';
 import { makeKnowledgeRecord } from '../../lib/knowledge/record';
+import { summarizeForKnowledge } from '../../lib/knowledge/summarize';
 import { saveKnowledgeRecord } from '../../lib/storage/db';
 import type { ByotProviderId } from '../../lib/types';
 import { putChatSession } from '../../lib/storage/db';
@@ -63,22 +64,28 @@ export function AskAiSection({
         setAnswer((current) => current + token);
       });
       setAnswer(result);
+      try {
+        const summary = await summarizeForKnowledge(llm.generate, prompt, result);
+        if (summary !== null) {
+          const readings = readingsFromRuby(rubyHtml);
+          await saveKnowledgeRecord(
+            makeKnowledgeRecord(
+              {
+                kind: 'ai',
+                sentence,
+                question: prompt,
+                summary,
+                ...(readings.length === 0 ? {} : { readings }),
+                ...(romaji === null ? {} : { romaji }),
+              },
+              summary,
+            ),
+          );
+        }
+      } catch {
+        // The answer remains usable even if the knowledge summary fails.
+      }
       setAskState('ready');
-      void saveKnowledgeRecord(
-        makeKnowledgeRecord(
-          {
-            kind: 'ai',
-            sentence,
-            question: prompt,
-            answer: result,
-            ...(readingsFromRuby(rubyHtml).length === 0
-              ? {}
-              : { readings: readingsFromRuby(rubyHtml) }),
-            ...(romaji === null ? {} : { romaji }),
-          },
-          result,
-        ),
-      ).catch(() => undefined);
     } catch (cause) {
       setAskState('error');
       setError(cause instanceof Error ? cause.message : t('AI model could not be loaded.'));
