@@ -3,7 +3,8 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/Toast';
 import { LibraryPage } from './features/library/LibraryPage';
 import { ReaderPage } from './features/reader/ReaderPage';
-import { SettingsProvider } from './features/settings/SettingsProvider';
+import { SettingsPage } from './features/settings/SettingsPage';
+import { SettingsProvider, useSettings } from './features/settings/SettingsProvider';
 import { parseRoute, type Route } from './lib/router';
 import { useLaunchQueue } from './pwa/useLaunchQueue';
 import { useOnlineStatus } from './pwa/useOnlineStatus';
@@ -17,6 +18,7 @@ function currentRoute(): Route {
 
 function AppShell() {
   const [route, setRoute] = useState<Route>(currentRoute);
+  const { settingsOpen } = useSettings();
 
   useLaunchQueue();
   useOnlineStatus();
@@ -35,6 +37,7 @@ function AppShell() {
   return (
     <>
       {route.name === 'reader' ? <ReaderPage bookId={route.bookId} /> : <LibraryPage />}
+      {settingsOpen ? <SettingsPage /> : null}
       <UpdateToast />
     </>
   );
@@ -42,12 +45,12 @@ function AppShell() {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <SettingsProvider>
-        <ToastProvider>
+    <SettingsProvider>
+      <ToastProvider>
+        <ErrorBoundary>
           <AppShell />
-        </ToastProvider>
-      </SettingsProvider>
-    </ErrorBoundary>
+        </ErrorBoundary>
+      </ToastProvider>
+    </SettingsProvider>
   );
 }

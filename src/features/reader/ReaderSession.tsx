@@ -9,9 +9,12 @@ import {
   preload,
   type FuriganaStatus,
 } from '../../lib/furigana/service';
+import { useI18n } from '../../lib/i18n/useI18n';
+import { clamp01 } from '../../lib/reader/scrollProgress';
 import { navigateToLibrary } from '../../lib/router';
-import type { BookRecord, ChapterRecord, ChapterSet, TocEntry } from '../../lib/types';
-import { SettingsSheet } from '../settings/SettingsSheet';
+import { shareBook } from '../../lib/share/shareBook';
+import { addBookmark, deleteBookmark, listBookmarks } from '../../lib/storage';
+import type { Bookmark, BookRecord, ChapterRecord, ChapterSet, TocEntry } from '../../lib/types';
 import { useSettings } from '../settings/SettingsProvider';
 import { SentenceSheet } from '../sentence/SentenceSheet';
 import { ReaderToolbar } from './ReaderToolbar';
@@ -32,8 +35,11 @@ interface ReaderSessionProps {
   firstChapter: ChapterRecord;
 }
 
+const BOOKMARK_TOLERANCE = 0.02;
+
 export function ReaderSession({ book, chapterSet, firstChapter }: ReaderSessionProps) {
-  const { settings } = useSettings();
+  const { settings, openSettings } = useSettings();
+  const { t } = useI18n();
   const { push } = useToast();
   const { navigation, percent, reportRatio, navigateTo, flush } = useReaderSession(
     book,
@@ -42,17 +48,72 @@ export function ReaderSession({ book, chapterSet, firstChapter }: ReaderSessionP
   const chapter = chapterSet.chapters[navigation.chapterIndex] ?? firstChapter;
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [tocOpen, setTocOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [selected, setSelected] = useState<SelectedSentence | null>(null);
   const [retryNonce, setRetryNonce] = useState(0);
   const [furiganaStatus, setFuriganaStatus] = useState<FuriganaStatus>(() =>
     getFuriganaStatus(),
   );
   const [showPill, setShowPill] = useState(true);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [currentBookmarkId, setCurrentBookmarkId] = useState<string | null>(null);
+  const ratioRef = useRef(navigation.initialRatio);
+  const bookmarksRef = useRef<Bookmark[]>([]);
 
   const readAloud = useReadAloud(chapter, scrollRef);
   const { stop: stopReadAloud, toggle: toggleReadAloud, isReading, speakingId } = readAloud;
   const assets = useChapterAssets(book.id, chapter);
+
+  const refreshBookmarks = useCallback(async (): Promise<void> => {
+    try {
+      setBookmarks(await listBookmarks(book.id));
+    } catch {
+      push(t('Bookmarks could not be loaded.'), { tone: 'error' });
+    }
+  }, [book.id, push, t]);
+
+  useEffect(() => {
+    void refreshBookmarks();
+  }, [refreshBookmarks]);
+
+  useEffect(() => {
+    bookmarksRef.current = bookmarks;
+  }, [bookmarks]);
+
+  useEffect(() => {
+    ratioRef.current = navigation.initialRatio;
+  }, [navigation.initialRatio, navigation.nonce]);
+
+  const currentBookmark =
+    bookmarks.find((bookmark) => bookmark.id === currentBookmarkId) ?? null;
+
+  const updateCurrentBookmark = useCallback(() => {
+    const match =
+      bookmarksRef.current.find(
+        (bookmark) =>
+          bookmark.chapterIndex === navigation.chapterIndex &&
+          Math.abs(bookmark.ratio - ratioRef.current) <= BOOKMARK_TOLERANCE,
+      ) ?? null;
+    setCurrentBookmarkId((previous) => (previous === match?.id ? previous : match?.id ?? null));
+  }, [navigation.chapterIndex]);
+
+  useEffect(() => {
+    updateCurrentBookmark();
+  }, [bookmarks, navigation.chapterIndex, navigation.nonce, updateCurrentBookmark]);
+
+  const handleRatioChange = useCallback(
+    (next: number) => {
+      ratioRef.current = clamp01(next);
+      reportRatio(next);
+      const match =
+        bookmarksRef.current.find(
+          (bookmark) =>
+            bookmark.chapterIndex === navigation.chapterIndex &&
+            Math.abs(bookmark.ratio - ratioRef.current) <= BOOKMARK_TOLERANCE,
+        ) ?? null;
+      setCurrentBookmarkId((previous) => (previous === match?.id ? previous : match?.id ?? null));
+    },
+    [navigation.chapterIndex, reportRatio],
+  );
 
   useEffect(() => onFuriganaStatusChange(setFuriganaStatus), []);
 
@@ -77,16 +138,90 @@ export function ReaderSession({ book, chapterSet, firstChapter }: ReaderSessionP
     void preload()
       .then(() => {
         setRetryNonce((value) => value + 1);
-        push('Furigana ready.', { tone: 'success' });
+        push(t('Furigana ready.'), { tone: 'success' });
       })
       .catch(() => {
-        push("Furigana couldn't load. Try again.", { tone: 'error' });
+        push(t("Furigana couldn't load. Try again."), { tone: 'error' });
       });
-  }, [push]);
+  }, [push, t]);
+
+  const addCurrentBookmark = useCallback(async (): Promise<void> => {
+    const existing = bookmarksRef.current.find(
+      (bookmark) =>
+        bookmark.chapterIndex === navigation.chapterIndex &&
+        Math.abs(bookmark.ratio - ratioRef.current) <= BOOKMARK_TOLERANCE,
+    );
+    if (existing !== undefined) {
+      push(t('Already bookmarked here.'));
+      return;
+    }
+
+    const bookmark: Bookmark = {
+      id: crypto.randomUUID(),
+      bookId: book.id,
+      chapterIndex: navigation.chapterIndex,
+      ratio: clamp01(ratioRef.current),
+      chapterTitle: chapter.title,
+      createdAt: Date.now(),
+    };
+
+    try {
+      await addBookmark(bookmark);
+      setBookmarks(await listBookmarks(book.id));
+      push(t('Bookmark added.'), { tone: 'success' });
+    } catch {
+      push(t('Bookmark could not be saved.'), { tone: 'error' });
+    }
+  }, [book.id, chapter.title, navigation.chapterIndex, push, t]);
+
+  const removeBookmark = useCallback(
+    async (bookmark: Bookmark): Promise<void> => {
+      try {
+        await deleteBookmark(bookmark.id);
+        setBookmarks(await listBookmarks(book.id));
+        push(t('Bookmark removed.'));
+      } catch {
+        push(t('Bookmark could not be removed.'), { tone: 'error' });
+      }
+    },
+    [book.id, push, t],
+  );
+
+  const toggleBookmark = useCallback(() => {
+    if (currentBookmark !== null) {
+      void removeBookmark(currentBookmark);
+      return;
+    }
+    void addCurrentBookmark();
+  }, [addCurrentBookmark, currentBookmark, removeBookmark]);
+
+  const handleShare = useCallback(async (): Promise<void> => {
+    const outcome = await shareBook(book);
+    if (outcome === 'shared') {
+      push(t('Shared.'));
+      return;
+    }
+    if (outcome === 'downloaded') {
+      push(t('Book downloaded. Share it from your files.'));
+      return;
+    }
+    if (outcome === 'copied') {
+      push(t('Aozora link copied.'));
+      return;
+    }
+    if (outcome === 'failed') {
+      push(t('Could not share this book.'), { tone: 'error' });
+    }
+  }, [book, push, t]);
 
   const handleNavigate = (entry: TocEntry): void => {
     setTocOpen(false);
     navigateTo(entry.chapterIndex, entry.fragment);
+  };
+
+  const handleNavigateBookmark = (bookmark: Bookmark): void => {
+    setTocOpen(false);
+    navigateTo(bookmark.chapterIndex, null, bookmark.ratio);
   };
 
   const handleNextChapter = useCallback(
@@ -119,24 +254,25 @@ export function ReaderSession({ book, chapterSet, firstChapter }: ReaderSessionP
         }}
         onToggleReadAloud={toggleReadAloud}
         onOpenToc={openToc}
+        onShare={() => void handleShare()}
         onOpenSettings={() => {
           stopReadAloud();
-          setSettingsOpen(true);
+          openSettings();
         }}
       />
 
       {settings.furigana && furiganaStatus === 'error' ? (
         <div className="furigana-banner" role="status">
-          <span>Furigana unavailable</span>
+          <span>{t('Furigana unavailable')}</span>
           <button type="button" className="button--text" onClick={handleRetryFurigana}>
-            Retry
+            {t('Retry')}
           </button>
         </div>
       ) : null}
 
       {showPill && settings.furigana && furiganaStatus === 'loading' ? (
         <div className="furigana-pill" role="status">
-          <Spinner /> Preparing furigana…
+          <Spinner /> {t('Preparing furigana…')}
         </div>
       ) : null}
 
@@ -155,7 +291,7 @@ export function ReaderSession({ book, chapterSet, firstChapter }: ReaderSessionP
         nonce={navigation.nonce}
         hasNext={hasNext}
         scrollRef={scrollRef}
-        onRatioChange={reportRatio}
+        onRatioChange={handleRatioChange}
         onOpenSentence={openSentence}
         onNextChapter={handleNextChapter}
       />
@@ -166,14 +302,28 @@ export function ReaderSession({ book, chapterSet, firstChapter }: ReaderSessionP
         </div>
         <div className="reader-status__row">
           <button type="button" className="reader-status__chapter" onClick={openToc}>
-            第 {navigation.chapterIndex + 1} 章 / {chapterCount} · {percent}%
+            {t('Chapter {current} of {total} · {percent}%', {
+              current: navigation.chapterIndex + 1,
+              total: chapterCount,
+              percent,
+            })}
           </button>
-          {isReading ? <span className="reader-status__reading">Reading aloud</span> : null}
+          {isReading ? <span className="reader-status__reading">{t('Reading aloud')}</span> : null}
           <div className="reader-status__nav">
             <button
               type="button"
               className="icon-button"
-              aria-label="Previous chapter"
+              aria-label={currentBookmark === null ? t('Add bookmark') : t('Remove bookmark')}
+              aria-pressed={currentBookmark !== null}
+              data-testid="bookmark-button"
+              onClick={toggleBookmark}
+            >
+              <Icon name={currentBookmark === null ? 'bookmark' : 'bookmark-filled'} />
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={t('Previous chapter')}
               disabled={navigation.chapterIndex <= 0}
               onClick={() => navigateTo(navigation.chapterIndex - 1)}
             >
@@ -182,7 +332,7 @@ export function ReaderSession({ book, chapterSet, firstChapter }: ReaderSessionP
             <button
               type="button"
               className="icon-button"
-              aria-label="Next chapter"
+              aria-label={t('Next chapter')}
               disabled={!hasNext}
               onClick={handleNextChapter}
             >
@@ -198,15 +348,12 @@ export function ReaderSession({ book, chapterSet, firstChapter }: ReaderSessionP
           entries={chapterSet.toc}
           chapters={chapterSet.chapters}
           currentIndex={navigation.chapterIndex}
+          bookmarks={bookmarks}
           onClose={() => setTocOpen(false)}
           onNavigate={handleNavigate}
-        />
-      ) : null}
-
-      {settingsOpen ? (
-        <SettingsSheet
-          onClose={() => setSettingsOpen(false)}
-          onRetryFurigana={handleRetryFurigana}
+          onAddBookmark={() => void addCurrentBookmark()}
+          onNavigateBookmark={handleNavigateBookmark}
+          onDeleteBookmark={(bookmark) => void removeBookmark(bookmark)}
         />
       ) : null}
 

@@ -451,6 +451,29 @@
   }
 }
 
+@media (max-width: 380px) {
+  .add-button {
+    width: 44px;
+    padding: 0;
+  }
+
+  .add-button__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .library-header {
+    gap: var(--space-2);
+  }
+}
+
 @media (max-width: 640px) {
   .wordmark__label {
     display: none;

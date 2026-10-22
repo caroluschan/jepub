@@ -7,12 +7,21 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import {
+  resolveUiLanguageSetting,
+  type UiLanguageCode,
+} from '../../lib/i18n/languages';
 import { loadSettings, saveSettings } from '../../lib/settings/settings';
 import type { Settings } from '../../lib/types';
 
 interface SettingsContextValue {
   settings: Settings;
   updateSettings: (patch: Partial<Settings>) => void;
+  language: UiLanguageCode;
+  settingsOpen: boolean;
+  settingsTrigger: HTMLElement | null;
+  openSettings: (trigger?: HTMLElement | null) => void;
+  closeSettings: () => void;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -30,19 +39,46 @@ function applyThemeMeta(theme: Settings['theme']): void {
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTrigger, setSettingsTrigger] = useState<HTMLElement | null>(null);
+  const language = resolveUiLanguageSetting(settings.uiLanguage);
 
   useEffect(() => {
     applyThemeMeta(settings.theme);
   }, [settings.theme]);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = 'ltr';
+  }, [language]);
 
   const updateSettings = useCallback((patch: Partial<Settings>) => {
     const next = saveSettings(patch);
     setSettings(next);
   }, []);
 
+  const openSettings = useCallback((trigger?: HTMLElement | null) => {
+    const active =
+      trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    setSettingsTrigger(active);
+    setSettingsOpen(true);
+  }, []);
+
+  const closeSettings = useCallback(() => {
+    setSettingsOpen(false);
+  }, []);
+
   const value = useMemo<SettingsContextValue>(
-    () => ({ settings, updateSettings }),
-    [settings, updateSettings],
+    () => ({
+      settings,
+      updateSettings,
+      language,
+      settingsOpen,
+      settingsTrigger,
+      openSettings,
+      closeSettings,
+    }),
+    [closeSettings, language, openSettings, settings, settingsOpen, settingsTrigger, updateSettings],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

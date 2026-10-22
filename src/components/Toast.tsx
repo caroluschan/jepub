@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 import { Icon } from './Icon';
+import { useI18n } from '../lib/i18n/useI18n';
 
 export type ToastTone = 'default' | 'error' | 'success';
 
@@ -40,6 +41,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 let toastCounter = 0;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
   const [items, setItems] = useState<ToastItem[]>([]);
   const timers = useRef(new Map<string, number>());
 
@@ -115,7 +117,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <button
               type="button"
               className="toast__dismiss"
-              aria-label="Dismiss notification"
+              aria-label={t('Dismiss notification')}
               onClick={() => dismiss(item.id)}
             >
               <Icon name="close" size={16} />

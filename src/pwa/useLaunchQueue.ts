@@ -1,17 +1,19 @@
 import { useEffect } from 'react';
 import { useToast } from '../components/Toast';
+import { useI18n } from '../lib/i18n/useI18n';
 import { ImportDuplicateError, ImportError, importEpubFile } from '../lib/import/importEpub';
 import { navigateToBook } from '../lib/router';
 import type { BookRecord } from '../lib/types';
 import { notifyLibraryChanged } from '../features/library/libraryEvents';
 
-function friendlyError(error: unknown): string {
+function friendlyError(error: unknown, fallback: string): string {
   if (error instanceof ImportError) return error.message;
-  return 'Could not import this EPUB.';
+  return fallback;
 }
 
 export function useLaunchQueue(): void {
   const { push } = useToast();
+  const { t } = useI18n();
 
   useEffect(() => {
     const queue = window.launchQueue;
@@ -34,9 +36,9 @@ export function useLaunchQueue(): void {
           } catch (error) {
             if (error instanceof ImportDuplicateError) {
               opened.push(error.existing);
-              push('This book is already in your library.', { tone: 'default' });
+              push(t('This book is already in your library.'), { tone: 'default' });
             } else {
-              push(friendlyError(error), { tone: 'error' });
+              push(friendlyError(error, t('Could not import this EPUB.')), { tone: 'error' });
             }
           }
         }
@@ -50,5 +52,5 @@ export function useLaunchQueue(): void {
       disposed = true;
       queue.setConsumer(() => undefined);
     };
-  }, [push]);
+  }, [push, t]);
 }

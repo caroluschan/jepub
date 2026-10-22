@@ -20,6 +20,7 @@ describe('settings', () => {
       furiganaScript: 'katakana',
       onlineTranslation: false,
       translationTarget: 'en',
+      uiLanguage: 'system',
     });
     expect(DEFAULT_SETTINGS.onlineTranslation).toBe(false);
     expect(DEFAULT_SETTINGS.furiganaScript).toBe('katakana');
@@ -77,6 +78,22 @@ describe('settings', () => {
 
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ translationTarget: 'xx' }));
     expect(loadSettings().translationTarget).toBe('en');
+  });
+
+  it('SET-UI-LANGUAGE defaults to system and persists a supported language', () => {
+    expect(loadSettings().uiLanguage).toBe('system');
+
+    saveSettings({ uiLanguage: 'ja' });
+    expect(loadSettings().uiLanguage).toBe('ja');
+
+    saveSettings({ uiLanguage: 'zh-TW' });
+    expect(loadSettings().uiLanguage).toBe('zh-TW');
+
+    saveSettings({ uiLanguage: 'not-a-language' });
+    expect(loadSettings().uiLanguage).toBe('zh-TW');
+
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ uiLanguage: 'xx' }));
+    expect(loadSettings().uiLanguage).toBe('system');
   });
 
   it('SET-CLAMP clamps font size to 14..32 and rejects non-numbers', () => {

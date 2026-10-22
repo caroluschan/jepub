@@ -83,19 +83,24 @@ export function useReaderSession(book: BookRecord, chapterSet: ChapterSet) {
   );
 
   const navigateTo = useCallback(
-    (chapterIndex: number, fragment: string | null = null) => {
+    (chapterIndex: number, fragment: string | null = null, ratio = 0) => {
       const target = clampChapter(chapterIndex, count);
+      const targetRatio = clamp01(ratio);
       clearTimer();
       void persist(chapterRef.current, ratioRef.current);
       chapterRef.current = target;
-      ratioRef.current = 0;
+      ratioRef.current = targetRatio;
       setNavigation((current) => ({
         chapterIndex: target,
-        initialRatio: 0,
+        initialRatio: targetRatio,
         fragment,
         nonce: current.nonce + 1,
       }));
-      setPercent(count === 0 ? 0 : Math.round((target / count) * 100));
+      setPercent(
+        count === 0
+          ? 0
+          : Math.min(100, Math.max(0, Math.round(((target + targetRatio) / count) * 100))),
+      );
     },
     [clearTimer, count, persist],
   );

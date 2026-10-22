@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { ChapterRecord, FuriganaScript } from '../../lib/types';
+import { useI18n } from '../../lib/i18n/useI18n';
 import { BlockView } from './BlockView';
 
 interface ChapterViewProps {
@@ -25,6 +26,7 @@ function ChapterViewImpl({
   onOpenSentence,
   onNextChapter,
 }: ChapterViewProps) {
+  const { t } = useI18n();
   return (
     <article
       className="reader-content"
@@ -50,7 +52,7 @@ function ChapterViewImpl({
         <button type="button" className="next-chapter" onClick={onNextChapter}>
           <span lang="ja">次の章へ</span>
           <span className="next-chapter__label" lang="en">
-            Next chapter
+            {t('Next chapter')}
           </span>
         </button>
       ) : null}

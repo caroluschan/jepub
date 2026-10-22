@@ -2,8 +2,10 @@ import { useRef, useState } from 'react';
 import { Icon } from '../../components/Icon';
 import { ThemeToggle } from '../../components/ThemeToggle';
 import { useToast } from '../../components/Toast';
+import { useI18n } from '../../lib/i18n/useI18n';
 import { deleteBook } from '../../lib/storage';
 import type { BookRecord } from '../../lib/types';
+import { useSettings } from '../settings/SettingsProvider';
 import { AddBookSheet } from './AddBookSheet';
 import { BookCard } from './BookCard';
 import { DeleteBookDialog } from './DeleteBookDialog';
@@ -34,6 +36,8 @@ export function LibraryPage() {
   const { importing, importFiles, importDroppedFiles, importAozora, importSampleBook } =
     useBookImport();
   const { push } = useToast();
+  const { t } = useI18n();
+  const { openSettings } = useSettings();
   const epubInputRef = useRef<HTMLInputElement | null>(null);
   const textInputRef = useRef<HTMLInputElement | null>(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -66,9 +70,9 @@ export function LibraryPage() {
       await deleteBook(pendingDelete.id);
       setPendingDelete(null);
       await refresh();
-      push('Book removed from this device.', { tone: 'default' });
+      push(t('Book removed from this device.'), { tone: 'default' });
     } catch {
-      push('Could not remove this book. Try again.', { tone: 'error' });
+      push(t('Could not remove this book. Try again.'), { tone: 'error' });
     } finally {
       setDeleting(false);
     }
@@ -109,9 +113,18 @@ export function LibraryPage() {
           <span className="wordmark__label">日本語 EPUB READER</span>
         </h1>
         <div className="library-header__actions">
+          <button
+            type="button"
+            className="icon-button library-settings-button"
+            aria-label={t('Settings')}
+            data-testid="library-settings-button"
+            onClick={(event) => openSettings(event.currentTarget)}
+          >
+            <Icon name="gear" />
+          </button>
           <button type="button" className="button button--quiet add-button" onClick={openAddSheet}>
             <Icon name="plus" size={18} />
-            <span>Add book</span>
+            <span className="add-button__label">{t('Add book')}</span>
           </button>
           <ThemeToggle />
         </div>
@@ -120,7 +133,7 @@ export function LibraryPage() {
       <main className="library-main">
         {status === 'loading' ? (
           <div className="library-lede" aria-hidden="true">
-            <p className="label">Library</p>
+            <p className="label">{t('Library')}</p>
             <p className="library-tagline" lang="ja">
               日本語を、ゆっくり。
             </p>
@@ -131,14 +144,13 @@ export function LibraryPage() {
 
         {status === 'error' ? (
           <section className="library-error" role="alert">
-            <p className="label">Storage</p>
-            <h2>JEPUB can&apos;t read this browser&apos;s storage.</h2>
+            <p className="label">{t('Storage')}</p>
+            <h2>{t("JEPUB can't read this browser's storage.")}</h2>
             <p>
-              IndexedDB may be blocked in private windows or by a browser setting. Your shelf needs
-              it to keep books on this device.
+              {t('IndexedDB may be blocked in private windows or by a browser setting. Your shelf needs it to keep books on this device.')}
             </p>
             <button type="button" className="button" onClick={() => void refresh()}>
-              Retry
+              {t('Retry')}
             </button>
           </section>
         ) : null}
@@ -156,7 +168,9 @@ export function LibraryPage() {
             <div className="library-lede">
               <div>
                 <p className="label">
-                  Library · {books.length} {books.length === 1 ? 'volume' : 'volumes'}
+                  {books.length === 1
+                    ? t('Library · 1 volume')
+                    : t('Library · {count} volumes', { count: books.length })}
                 </p>
                 <p className="library-tagline" lang="ja">
                   日本語を、ゆっくり。
@@ -175,17 +189,17 @@ export function LibraryPage() {
       <footer className="library-footer">
         <p className="library-footer__storage">
           <span className="library-footer__dot" aria-hidden="true" />
-          <span>Stored on this device</span>
+          <span>{t('Stored on this device')}</span>
         </p>
-        <p className="library-footer__tag">Japanese EPUB reader</p>
+        <p className="library-footer__tag">{t('Japanese EPUB reader')}</p>
       </footer>
 
       <input
         ref={epubInputRef}
         className="visually-hidden"
         type="file"
-        accept=".epub,application/epub+zip"
-        aria-label="Choose EPUB files"
+        accept=".epub,.mobi,application/epub+zip,application/x-mobipocket-ebook"
+        aria-label={t('Choose EPUB / MOBI files')}
         data-testid="epub-input"
         multiple
         onChange={(event) => {
@@ -198,7 +212,7 @@ export function LibraryPage() {
         className="visually-hidden"
         type="file"
         accept=".txt,text/plain"
-        aria-label="Choose text files"
+        aria-label={t('Choose .txt files')}
         data-testid="text-input"
         multiple
         onChange={(event) => {

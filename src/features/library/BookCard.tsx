@@ -1,4 +1,5 @@
 import { Icon } from '../../components/Icon';
+import { useI18n } from '../../lib/i18n/useI18n';
 import type { BookRecord } from '../../lib/types';
 
 export function bookPercent(book: BookRecord): number {
@@ -13,6 +14,7 @@ interface BookCardProps {
 }
 
 export function BookCard({ book, onDelete }: BookCardProps) {
+  const { t } = useI18n();
   const coverUrl = book.coverDataUrl ?? null;
   const percent = bookPercent(book);
 
@@ -46,7 +48,9 @@ export function BookCard({ book, onDelete }: BookCardProps) {
           <p className="book-card__stats">
             <span>{percent}%</span>
             <span>
-              {book.chapterCount} {book.chapterCount === 1 ? 'chapter' : 'chapters'}
+              {book.chapterCount === 1
+                ? t('1 chapter')
+                : t('{count} chapters', { count: book.chapterCount })}
             </span>
           </p>
         </div>
@@ -54,7 +58,7 @@ export function BookCard({ book, onDelete }: BookCardProps) {
       <button
         type="button"
         className="book-card__delete"
-        aria-label={`Remove ${book.title}`}
+        aria-label={t('Remove {title}', { title: book.title })}
         onClick={() => onDelete(book)}
       >
         <Icon name="trash" size={16} />

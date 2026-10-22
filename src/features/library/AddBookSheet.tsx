@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Icon } from '../../components/Icon';
 import { Modal } from '../../components/Modal';
 import { Spinner } from '../../components/Spinner';
+import { useI18n } from '../../lib/i18n/useI18n';
 import type { AozoraImportResult, ImportingState } from './useBookImport';
 
 type AddTab = 'epub' | 'aozora' | 'text';
@@ -14,10 +15,10 @@ interface AddBookSheetProps {
   importing: ImportingState | null;
 }
 
-const TABS: ReadonlyArray<{ id: AddTab; label: string }> = [
-  { id: 'epub', label: 'EPUB' },
-  { id: 'aozora', label: 'Aozora' },
-  { id: 'text', label: 'Text' },
+const TABS: ReadonlyArray<{ id: AddTab }> = [
+  { id: 'epub' },
+  { id: 'aozora' },
+  { id: 'text' },
 ];
 
 export function AddBookSheet({
@@ -27,6 +28,7 @@ export function AddBookSheet({
   onAozora,
   importing,
 }: AddBookSheetProps) {
+  const { t } = useI18n();
   const [tab, setTab] = useState<AddTab>('epub');
   const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +69,7 @@ export function AddBookSheet({
     event.preventDefault();
     if (busy) return;
     if (url.trim().length === 0) {
-      setError('Paste an Aozora Bunko card or file URL first.');
+      setError(t('Paste an Aozora Bunko card or file URL first.'));
       return;
     }
 
@@ -84,21 +86,21 @@ export function AddBookSheet({
     <Modal
       onClose={onClose}
       variant="center"
-      ariaLabel="Add a book"
+      ariaLabel={t('Add a book')}
       panelTestId="add-book-sheet"
       initialFocusRef={closeRef}
     >
       <div className="add-book">
         <div className="modal-header add-book__header">
           <div>
-            <span className="label">Library</span>
-            <h2 className="modal-title">Add a book</h2>
+            <span className="label">{t('Library')}</span>
+            <h2 className="modal-title">{t('Add a book')}</h2>
           </div>
           <button
             ref={closeRef}
             type="button"
             className="icon-button"
-            aria-label="Close add a book"
+            aria-label={t('Close add a book')}
             data-testid="add-book-close"
             onClick={onClose}
           >
@@ -106,7 +108,7 @@ export function AddBookSheet({
           </button>
         </div>
 
-        <div className="add-book__tabs" role="tablist" aria-label="Book source">
+        <div className="add-book__tabs" role="tablist" aria-label={t('Book source')}>
           {TABS.map((entry, index) => (
             <button
               key={entry.id}
@@ -121,7 +123,7 @@ export function AddBookSheet({
               onClick={() => selectTab(entry.id)}
               onKeyDown={(event) => handleTabKeyDown(event, index)}
             >
-              {entry.label}
+              {entry.id === 'epub' ? t('EPUB / MOBI') : entry.id === 'aozora' ? t('Aozora') : t('Text')}
             </button>
           ))}
         </div>
@@ -134,8 +136,7 @@ export function AddBookSheet({
             className="add-book__panel"
           >
             <p className="add-book__copy">
-              Add one or more books from this device. EPUB files stay in your browser and open
-              offline once stored.
+              {t('Add one or more books from this device. EPUB and MOBI files stay in your browser and open offline once stored.')}
             </p>
             <button
               type="button"
@@ -144,9 +145,9 @@ export function AddBookSheet({
               disabled={busy}
               onClick={onChooseEpub}
             >
-              <Icon name="book" size={18} /> Choose EPUB files
+              <Icon name="book" size={18} /> {t('Choose EPUB / MOBI files')}
             </button>
-            <p className="add-book__note">You can also drop EPUB or TXT files on the shelf.</p>
+            <p className="add-book__note">{t('You can also drop EPUB, MOBI, or TXT files on the shelf.')}</p>
           </div>
         ) : null}
 
@@ -159,7 +160,7 @@ export function AddBookSheet({
           >
             <form className="add-book__form" onSubmit={(event) => void submitAozora(event)}>
               <label className="add-book__field-label" htmlFor="aozora-url">
-                Work card or file URL
+                {t('Work card or file URL')}
               </label>
               <input
                 id="aozora-url"
@@ -191,11 +192,7 @@ export function AddBookSheet({
                   disabled={busy || url.trim().length === 0}
                 >
                   {busy ? <Spinner /> : null}
-                  {busy
-                    ? importing?.phase === 'Adding…'
-                      ? 'Adding…'
-                      : 'Downloading…'
-                    : 'Download & add'}
+                  {busy ? importing?.phase ?? t('Downloading…') : t('Download & add')}
                 </button>
                 <a
                   className="button--text add-book__external"
@@ -203,12 +200,11 @@ export function AddBookSheet({
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open Aozora Bunko ↗
+                  {t('Open Aozora Bunko ↗')}
                 </a>
               </div>
               <p className="add-book__note" id="aozora-note">
-                Paste a work&apos;s card page URL. Downloads are fetched through Jina Reader
-                because browsers cannot call Aozora directly.
+                {t("Paste a work's card page URL. Downloads are fetched through Jina Reader because browsers cannot call Aozora directly.")}
               </p>
             </form>
           </div>
@@ -222,7 +218,7 @@ export function AddBookSheet({
             className="add-book__panel"
           >
             <p className="add-book__copy">
-              Bring plain Japanese prose into the reader as a single chapter.
+              {t('Bring plain Japanese prose into the reader as a single chapter.')}
             </p>
             <button
               type="button"
@@ -231,10 +227,10 @@ export function AddBookSheet({
               disabled={busy}
               onClick={onChooseText}
             >
-              <Icon name="book" size={18} /> Choose .txt files
+              <Icon name="book" size={18} /> {t('Choose .txt files')}
             </button>
             <p className="add-book__note">
-              UTF-8 or Shift_JIS. The filename becomes the title.
+              {t('UTF-8 or Shift_JIS. The filename becomes the title.')}
             </p>
           </div>
         ) : null}

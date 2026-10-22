@@ -10,6 +10,7 @@ export interface Settings {
   furiganaScript: FuriganaScript;
   onlineTranslation: boolean;
   translationTarget: string;
+  uiLanguage: string;
 }
 
 export interface BookProgress {
@@ -31,7 +32,17 @@ export interface BookRecord {
   addedAt: number;
   lastOpenedAt: number | null;
   progress: BookProgress;
-  source: 'file' | 'sample' | 'handler' | 'drop' | 'text' | 'aozora';
+  source: 'file' | 'sample' | 'handler' | 'drop' | 'text' | 'aozora' | 'mobi';
+  sourceUrl?: string | null;
+}
+
+export interface Bookmark {
+  id: string;
+  bookId: string;
+  chapterIndex: number;
+  ratio: number;
+  chapterTitle: string;
+  createdAt: number;
 }
 
 export interface TocEntry {

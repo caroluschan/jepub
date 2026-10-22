@@ -1,5 +1,11 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
-import type { BookProgress, BookRecord, ChapterSet, TranslationProvider } from '../types';
+import type {
+  Bookmark,
+  BookProgress,
+  BookRecord,
+  ChapterSet,
+  TranslationProvider,
+} from '../types';
 import type { AssetInput, StoredAsset, StoredFile, StoredTranslation } from './types';
 
 interface JepubDatabase extends DBSchema {
@@ -26,6 +32,11 @@ interface JepubDatabase extends DBSchema {
     value: StoredTranslation;
     indexes: { createdAt: number };
   };
+  bookmarks: {
+    key: string;
+    value: Bookmark;
+    indexes: { bookId: string };
+  };
 }
 
 export function assetKey(bookId: string, path: string): string {
@@ -39,20 +50,27 @@ export function openDb(): Promise<IDBPDatabase<JepubDatabase>> {
     // Promise.resolve().then() also converts a synchronous IndexedDB failure
     // into a rejection instead of throwing out of openDb().
     const attempt = Promise.resolve().then(() =>
-      openDB<JepubDatabase>('jepub', 1, {
-        upgrade(database) {
-          const books = database.createObjectStore('books', { keyPath: 'id' });
-          books.createIndex('lastOpenedAt', 'lastOpenedAt');
-          books.createIndex('fileHash', 'fileHash');
+      openDB<JepubDatabase>('jepub', 2, {
+        upgrade(database, oldVersion) {
+          if (oldVersion < 1) {
+            const books = database.createObjectStore('books', { keyPath: 'id' });
+            books.createIndex('lastOpenedAt', 'lastOpenedAt');
+            books.createIndex('fileHash', 'fileHash');
 
-          database.createObjectStore('files', { keyPath: 'id' });
-          database.createObjectStore('chapterSets', { keyPath: 'bookId' });
+            database.createObjectStore('files', { keyPath: 'id' });
+            database.createObjectStore('chapterSets', { keyPath: 'bookId' });
 
-          const assets = database.createObjectStore('assets', { keyPath: 'key' });
-          assets.createIndex('bookId', 'bookId');
+            const assets = database.createObjectStore('assets', { keyPath: 'key' });
+            assets.createIndex('bookId', 'bookId');
 
-          const translations = database.createObjectStore('translations', { keyPath: 'key' });
-          translations.createIndex('createdAt', 'createdAt');
+            const translations = database.createObjectStore('translations', { keyPath: 'key' });
+            translations.createIndex('createdAt', 'createdAt');
+          }
+
+          if (oldVersion < 2) {
+            const bookmarks = database.createObjectStore('bookmarks', { keyPath: 'id' });
+            bookmarks.createIndex('bookId', 'bookId');
+          }
         },
       }),
     );
@@ -131,13 +149,21 @@ export async function updateProgress(
 export async function deleteBook(id: string): Promise<void> {
   const database = await openDb();
   const transaction = database.transaction(
-    ['books', 'files', 'chapterSets', 'assets', 'translations'],
+    ['books', 'files', 'chapterSets', 'assets', 'translations', 'bookmarks'],
     'readwrite',
   );
 
   const assetKeys = await transaction.objectStore('assets').index('bookId').getAllKeys(id);
   for (const key of assetKeys) {
     await transaction.objectStore('assets').delete(key);
+  }
+
+  const bookmarkKeys = await transaction
+    .objectStore('bookmarks')
+    .index('bookId')
+    .getAllKeys(id);
+  for (const key of bookmarkKeys) {
+    await transaction.objectStore('bookmarks').delete(key);
   }
 
   await transaction.objectStore('books').delete(id);

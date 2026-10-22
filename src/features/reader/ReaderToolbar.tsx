@@ -1,4 +1,5 @@
 import { Icon } from '../../components/Icon';
+import { useI18n } from '../../lib/i18n/useI18n';
 
 interface ReaderToolbarProps {
   bookTitle: string;
@@ -7,6 +8,7 @@ interface ReaderToolbarProps {
   onBack: () => void;
   onToggleReadAloud: () => void;
   onOpenToc: () => void;
+  onShare: () => void;
   onOpenSettings: () => void;
 }
 
@@ -17,14 +19,17 @@ export function ReaderToolbar({
   onBack,
   onToggleReadAloud,
   onOpenToc,
+  onShare,
   onOpenSettings,
 }: ReaderToolbarProps) {
+  const { t } = useI18n();
+
   return (
     <header className="reader-toolbar" data-testid="reader-toolbar">
       <button
         type="button"
         className="icon-button"
-        aria-label="Back to library"
+        aria-label={t('Back to library')}
         data-testid="back-button"
         onClick={onBack}
       >
@@ -44,7 +49,7 @@ export function ReaderToolbar({
         <button
           type="button"
           className="icon-button"
-          aria-label={isReading ? 'Stop reading aloud' : 'Read aloud'}
+          aria-label={isReading ? t('Stop reading aloud') : t('Read aloud')}
           aria-pressed={isReading}
           data-testid="read-aloud-button"
           onClick={onToggleReadAloud}
@@ -54,7 +59,16 @@ export function ReaderToolbar({
         <button
           type="button"
           className="icon-button"
-          aria-label="Contents"
+          aria-label={t('Share')}
+          data-testid="share-button"
+          onClick={onShare}
+        >
+          <Icon name="share" />
+        </button>
+        <button
+          type="button"
+          className="icon-button"
+          aria-label={t('Contents')}
           data-testid="toc-button"
           onClick={onOpenToc}
         >
@@ -63,7 +77,7 @@ export function ReaderToolbar({
         <button
           type="button"
           className="icon-button reader-toolbar__type"
-          aria-label="Reader settings"
+          aria-label={t('Reader settings')}
           data-testid="settings-button"
           onClick={onOpenSettings}
         >

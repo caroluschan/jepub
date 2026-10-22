@@ -17,7 +17,7 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 ## Features
 
 **A shelf that stays yours**
-- Import EPUB files from your device, drag and drop them, or open them from another app on supported browsers.
+- Import EPUB and MOBI files from your device, or drag and drop them onto the shelf. Open EPUB files from another app on supported browsers.
 - Add plain `.txt` files in UTF-8, UTF-16, or Shift_JIS.
 - Download public-domain works directly from Aozora Bunko.
 - Books, covers, chapters, reading positions, and translated sentences are stored locally in IndexedDB.
@@ -28,8 +28,17 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Vertical Japanese (`vertical-rl`) or horizontal layout.
 - Adjustable text size from 14–32px.
 - Light and dark monochrome themes.
-- Table of contents, chapter navigation, illustrations, and restored reading positions.
+- Table of contents, chapter navigation, illustrations, bookmarks, and restored reading positions.
+- A full Settings page, opened from the library or the reader, with appearance, reading, translation, storage, and about sections.
+- Eight interface languages: English, Japanese, Simplified Chinese, Traditional Chinese, Korean, Spanish, French, and German. System language is used by default.
+- Share the stored EPUB/MOBI/TXT file, or the Aozora Bunko card link, with the native share sheet.
 - Lazy furigana: readings are prepared as you reach each part of the book, not all at once.
+
+**Bookmarks and sharing**
+- Add or remove a bookmark from the reading footer; bookmarks store the chapter and exact scroll position.
+- Open the Contents drawer and switch to **Bookmarks** to jump to or delete saved places. Bookmarks persist across reloads.
+- Share the original EPUB/MOBI/TXT file through the browser's share sheet, with a download fallback where file sharing is unavailable.
+- Aozora Bunko imports share their source card link instead of a downloaded file.
 
 **Tap a sentence**
 - Ruby readings, spaced romaji, and a translation panel.
@@ -55,7 +64,7 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 
 | Source | How it works |
 |---|---|
-| **EPUB** | Choose one or more `.epub` files, or drop them onto the shelf. |
+| **EPUB / MOBI** | Choose one or more `.epub` or `.mobi` files, or drop them onto the shelf. |
 | **Text** | Choose `.txt` files. The filename becomes the title; paragraphs become the chapter. |
 | **Aozora Bunko** | Open a work on [aozora.gr.jp](https://www.aozora.gr.jp/), copy its card URL (or a direct `.html` file URL), and paste it into the Aozora tab. |
 
@@ -147,6 +156,7 @@ The app is built for the project path `/jepub/`. If you fork it under a differen
 - `vite-plugin-pwa` / Workbox for offline support
 - IndexedDB via `idb`
 - EPUB parsing with JSZip
+- MOBI/KF8 parsing with `@lingo-reader/mobi-parser`
 - Kuroshiro + kuromoji for furigana and romaji, with a custom browser dictionary loader
 - DOMPurify for sanitized ruby markup
 - Chrome built-in Translator API and MyMemory for translation
@@ -157,7 +167,7 @@ The app is built for the project path `/jepub/`. If you fork it under a differen
 
 ```
 src/lib/epub/        EPUB container, OPF, TOC, content extraction
-src/lib/import/      EPUB, text, Aozora, and persistence pipelines
+src/lib/import/      EPUB, MOBI, text, Aozora, and persistence pipelines
 src/lib/furigana/    Kuroshiro, dictionary loader, queue, sanitizer
 src/lib/translate/   language list, providers, cache
 src/lib/reader/      scroll behavior
@@ -172,6 +182,7 @@ docs/                committed production build
 
 - Sample text: Natsume Sōseki, *Wagahai wa Neko de Aru* (public domain); sample cover and illustration generated for this project.
 - [Kuroshiro](https://github.com/hexenq/kuroshiro) and [kuromoji](https://github.com/takuyaa/kuromoji.js)
+- [@lingo-reader/mobi-parser](https://github.com/hhk-png/lingo-reader) for MOBI/KF8 parsing
 - [JSZip](https://stuk.github.io/jszip/), [idb](https://github.com/jakearchibald/idb), [DOMPurify](https://github.com/cure53/DOMPurify)
 - [Vite](https://vite.dev/), [React](https://react.dev/), [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/)
 - [Aozora Bunko](https://www.aozora.gr.jp/) for public-domain Japanese literature

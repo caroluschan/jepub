@@ -8,6 +8,7 @@ import './styles/library.css';
 import './styles/add-book.css';
 import './styles/reader.css';
 import './styles/sentence.css';
+import './styles/settings.css';
 
 const container = document.getElementById('root');
 if (container === null) {

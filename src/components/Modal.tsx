@@ -2,7 +2,7 @@ import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { FocusTrap } from './FocusTrap';
 
-export type ModalVariant = 'center' | 'sheet' | 'drawer' | 'confirm';
+export type ModalVariant = 'center' | 'sheet' | 'drawer' | 'confirm' | 'full';
 
 interface ModalProps {
   onClose: () => void;

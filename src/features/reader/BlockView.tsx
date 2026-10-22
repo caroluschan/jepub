@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useI18n } from '../../lib/i18n/useI18n';
 import type { ChapterBlock, FuriganaScript } from '../../lib/types';
 import { SentenceSpan } from './SentenceSpan';
 import { useFuriganaBlocks } from './useFuriganaBlocks';
@@ -34,6 +35,7 @@ function BlockViewImpl({
   speakingId,
   onOpenSentence,
 }: BlockViewProps) {
+  const { t } = useI18n();
   const sentences = 'sentences' in block ? block.sentences : [];
   const { attachRef, html } = useFuriganaBlocks(
     sentences,
@@ -115,8 +117,8 @@ function BlockViewImpl({
       return (
         <figure className="reader-block reader-figure" data-block-index={blockIndex}>
           {url === undefined ? (
-            <div className="reader-image-missing" role="img" aria-label={block.alt || 'Image'}>
-              <span lang="en">Image unavailable</span>
+            <div className="reader-image-missing" role="img" aria-label={block.alt || t('Image')}>
+              <span lang="en">{t('Image unavailable')}</span>
             </div>
           ) : (
             <img src={url} alt={block.alt} loading="lazy" />

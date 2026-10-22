@@ -18,4 +18,11 @@ export {
   updateBookCoverDataUrl,
 } from './books';
 export { getAssets } from './assets';
-export type { AssetInput, StoredAsset, StoredFile, StoredTranslation } from './types';
+export { addBookmark, deleteBookmark, listBookmarks } from './bookmarks';
+export type {
+  AssetInput,
+  Bookmark,
+  StoredAsset,
+  StoredFile,
+  StoredTranslation,
+} from './types';

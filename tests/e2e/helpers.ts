@@ -203,6 +203,7 @@ export async function setSettingsBeforeLoad(
       furiganaScript: 'katakana',
       onlineTranslation: false,
       translationTarget: 'en',
+      uiLanguage: 'en',
     };
     window.localStorage.setItem(key, JSON.stringify({ ...existing, ...settingsPatch }));
     window.sessionStorage.setItem(seedKey, '1');

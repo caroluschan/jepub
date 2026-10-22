@@ -8,6 +8,7 @@ export interface SaveParsedBookInput {
   fileName: string;
   source: BookRecord['source'];
   fileHash: string;
+  sourceUrl?: string | null;
 }
 
 function requestPersistence(): void {
@@ -19,7 +20,7 @@ function requestPersistence(): void {
 
 /** Builds the library record and writes the book, file, chapter set, and assets atomically. */
 export async function saveParsedBook(input: SaveParsedBookInput): Promise<ImportedBook> {
-  const { parsed, blob, fileName, source, fileHash } = input;
+  const { parsed, blob, fileName, source, fileHash, sourceUrl } = input;
   const coverDataUrl =
     parsed.cover === null
       ? null
@@ -39,6 +40,7 @@ export async function saveParsedBook(input: SaveParsedBookInput): Promise<Import
     lastOpenedAt: null,
     progress: { chapterIndex: 0, ratio: 0 },
     source,
+    sourceUrl: sourceUrl ?? null,
   };
 
   const chapterSet = {

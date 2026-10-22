@@ -21,12 +21,13 @@
     "verify:full": "npm run verify && npm run test:e2e"
   },
   "dependencies": {
+    "@lingo-reader/mobi-parser": "^0.4.6",
     "dompurify": "3.4.17",
     "idb": "8.0.4",
     "jszip": "3.10.2",
+    "kuromoji": "0.1.2",
     "kuroshiro": "1.2.1",
     "kuroshiro-analyzer-kuromoji": "1.1.0",
-    "kuromoji": "0.1.2",
     "path-browserify": "1.0.1",
     "react": "19.3.1",
     "react-dom": "19.3.1"

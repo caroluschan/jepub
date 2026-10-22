@@ -12,10 +12,10 @@ test('@add-sheet opens, switches between three sources, and closes', async ({ pa
 
   const sheet = page.getByRole('dialog', { name: 'Add a book' });
   await expect(sheet).toBeVisible();
-  await expect(page.getByRole('tab', { name: 'EPUB' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: 'EPUB / MOBI' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByTestId('add-epub')).toBeVisible();
 
-  await page.getByRole('tab', { name: 'EPUB' }).focus();
+  await page.getByRole('tab', { name: 'EPUB / MOBI' }).focus();
   await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('tab', { name: 'Aozora' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('tab', { name: 'Aozora' })).toBeFocused();

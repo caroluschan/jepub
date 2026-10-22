@@ -1,0 +1,137 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.settings-page__header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex: none;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: calc(var(--space-4) + var(--safe-top)) clamp(20px, 4vw, 32px) var(--space-4);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.settings-page__heading {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settings-page__title {
+  font-family: var(--font-reading);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.settings-page__body {
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  min-height: 0;
+  margin: 0 auto;
+  padding: var(--space-4) clamp(20px, 4vw, 32px) calc(var(--space-12) + var(--safe-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.settings-group {
+  padding: var(--space-6) 0 var(--space-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.settings-group:last-of-type {
+  border-bottom: 0;
+}
+
+.settings-group__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.settings-group__title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.settings-group__note {
+  color: var(--muted);
+  font-family: var(--font-english);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.settings-group .settings-section {
+  padding: var(--space-4) 0;
+}
+
+.settings-group .settings-section:first-of-type {
+  padding-top: 0;
+}
+
+.settings-group .settings-section:last-of-type {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.settings-select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.settings-select:focus-visible {
+  border-color: var(--ink);
+}
+
+.settings-retry {
+  justify-self: start;
+}
+
+.settings-link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  font-size: 12px;
+}
+
+.settings-group .settings-row__note {
+  max-width: 52ch;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 520px) {
+  .settings-page__title {
+    font-size: 21px;
+  }
+
+  .settings-group__note {
+    display: none;
+  }
+}

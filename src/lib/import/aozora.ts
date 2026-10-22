@@ -150,5 +150,6 @@ export async function importAozoraBook(
     fileName: `aozora-${safeId}.html`,
     source: 'aozora',
     fileHash,
+    sourceUrl: info.url,
   });
 }

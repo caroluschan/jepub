@@ -1,4 +1,5 @@
 import type { Settings } from '../types';
+import { isUiLanguageSetting, DEFAULT_UI_LANGUAGE } from '../i18n/languages';
 import {
   DEFAULT_TRANSLATION_TARGET,
   isTranslationTarget,
@@ -14,6 +15,7 @@ export const DEFAULT_SETTINGS: Settings = Object.freeze({
   furiganaScript: 'katakana',
   onlineTranslation: false,
   translationTarget: DEFAULT_TRANSLATION_TARGET,
+  uiLanguage: DEFAULT_UI_LANGUAGE,
 });
 
 export const MIN_FONT_SIZE = 14;
@@ -45,6 +47,7 @@ function parseSettings(raw: unknown): Settings {
   const furiganaScript = raw['furiganaScript'];
   const onlineTranslation = raw['onlineTranslation'];
   const translationTarget = raw['translationTarget'];
+  const uiLanguage = raw['uiLanguage'];
 
   return {
     theme: theme === 'light' || theme === 'dark' ? theme : DEFAULT_SETTINGS.theme,
@@ -68,6 +71,9 @@ function parseSettings(raw: unknown): Settings {
     translationTarget: isTranslationTarget(translationTarget)
       ? translationTarget
       : DEFAULT_TRANSLATION_TARGET,
+    uiLanguage: isUiLanguageSetting(uiLanguage)
+      ? uiLanguage
+      : DEFAULT_SETTINGS.uiLanguage,
   };
 }
 
@@ -104,6 +110,9 @@ function applyPatch(current: Settings, patch: Partial<Settings>): Settings {
   }
   if (isTranslationTarget(patch.translationTarget)) {
     next.translationTarget = patch.translationTarget;
+  }
+  if (isUiLanguageSetting(patch.uiLanguage)) {
+    next.uiLanguage = patch.uiLanguage;
   }
 
   return next;

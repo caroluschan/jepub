@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useToast } from '../components/Toast';
+import { useI18n } from '../lib/i18n/useI18n';
 
 export function UpdateToast() {
   const { push } = useToast();
+  const { t } = useI18n();
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const lastUpdateCheckRef = useRef(Date.now());
   const {
@@ -32,25 +34,25 @@ export function UpdateToast() {
 
   useEffect(() => {
     if (!offlineReady) return;
-    push('JEPUB is ready to work offline.');
+    push(t('JEPUB is ready to work offline.'));
     setOfflineReady(false);
   }, [offlineReady, push, setOfflineReady]);
 
   useEffect(() => {
     if (!needRefresh) return;
-    push('A new version of JEPUB is ready.', {
+    push(t('A new version of JEPUB is ready.'), {
       duration: 0,
       actions: [
         {
-          label: 'Reload',
+          label: t('Reload'),
           onClick: () => {
             void updateServiceWorker(true).catch(() => {
-              push('Could not update JEPUB. Reload the page to try again.', { tone: 'error' });
+              push(t('Could not update JEPUB. Reload the page to try again.'), { tone: 'error' });
             });
           },
         },
         {
-          label: 'Later',
+          label: t('Later'),
           onClick: (dismiss) => {
             dismiss();
             setNeedRefresh(false);
@@ -58,7 +60,7 @@ export function UpdateToast() {
         },
       ],
     });
-  }, [needRefresh, push, setNeedRefresh, updateServiceWorker]);
+  }, [needRefresh, push, setNeedRefresh, t, updateServiceWorker]);
 
   return null;
 }

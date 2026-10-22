@@ -192,6 +192,9 @@ describe('Aozora import', () => {
     expect(imported.book.title).toBe('羅生門');
     expect(imported.book.author).toBe('芥川龍之介');
     expect(imported.book.fileName).toBe('aozora-127_15260.html');
+    expect(imported.book.sourceUrl).toBe(
+      'https://www.aozora.gr.jp/cards/000879/files/127_15260.html',
+    );
   });
 
   it('IMP-AOZORA-MOCK persists the parsed work and deduplicates it', async () => {
@@ -205,6 +208,9 @@ describe('Aozora import', () => {
     );
 
     expect(imported.book.source).toBe('aozora');
+    expect(imported.book.sourceUrl).toBe(
+      'https://www.aozora.gr.jp/cards/000879/card127.html',
+    );
     expect(imported.book.language).toBe('ja');
     expect(imported.book.cover).toBeNull();
     expect(imported.book.fileName).toBe('aozora-127.html');
