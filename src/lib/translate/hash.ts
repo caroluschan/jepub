@@ -1,3 +1,5 @@
+import { DEFAULT_TRANSLATION_TARGET, getTranslationLanguage } from './languages';
+
 function toHex(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
   let hex = '';
@@ -5,8 +7,12 @@ function toHex(buffer: ArrayBuffer): string {
   return hex;
 }
 
-export async function translationKey(text: string): Promise<string> {
-  const encoded = new TextEncoder().encode(`v1|en|${text}`);
+export async function translationKey(
+  text: string,
+  targetLanguage: string = DEFAULT_TRANSLATION_TARGET,
+): Promise<string> {
+  const target = getTranslationLanguage(targetLanguage).code;
+  const encoded = new TextEncoder().encode(`v1|${target}|${text}`);
   const digest = await crypto.subtle.digest('SHA-256', encoded);
   return toHex(digest);
 }

@@ -9,7 +9,9 @@ import {
   speakJapanese,
   stopSpeaking,
 } from '../../lib/speech/speech';
+import { TRANSLATION_LANGUAGES } from '../../lib/translate/languages';
 import type { TranslationProvider } from '../../lib/types';
+import { useSettings } from '../settings/SettingsProvider';
 import { useSentenceDetails, type TranslationView } from './useSentenceDetails';
 
 interface SentenceSheetProps {
@@ -104,13 +106,14 @@ function TranslationBlock({
   }
 
   return (
-    <p className="sentence-sheet__translation" data-testid="sentence-translation">
+    <p className="sentence-sheet__translation" dir="auto" data-testid="sentence-translation">
       {translation.text}
     </p>
   );
 }
 
 export function SentenceSheet({ sentence, onClose, restoreFocus }: SentenceSheetProps) {
+  const { settings, updateSettings } = useSettings();
   const { push } = useToast();
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const mountedRef = useRef(true);
@@ -228,7 +231,22 @@ export function SentenceSheet({ sentence, onClose, restoreFocus }: SentenceSheet
 
         <div className="sentence-sheet__line">
           <div className="sentence-sheet__translation-head">
-            <span className="label">English</span>
+            <label className="label" htmlFor="translation-language">
+              Translate to
+            </label>
+            <select
+              id="translation-language"
+              className="translation-language-select"
+              value={settings.translationTarget}
+              data-testid="translation-language"
+              onChange={(event) => updateSettings({ translationTarget: event.currentTarget.value })}
+            >
+              {TRANSLATION_LANGUAGES.map((language) => (
+                <option value={language.code} key={language.code}>
+                  {language.label}
+                </option>
+              ))}
+            </select>
             {translation.status === 'ready' ? (
               <span className="provider-chip" data-testid="translation-provider">
                 {providerLabel(translation.provider, translation.cached)}

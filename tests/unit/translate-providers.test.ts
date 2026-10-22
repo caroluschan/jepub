@@ -43,15 +43,62 @@ describe('translation providers', () => {
 
     const providers: string[] = [];
     const first = await translateSentence('猫', {
+      targetLanguage: 'en',
       onlineEnabled: false,
       onProvider: (provider) => providers.push(provider),
     });
     expect(first).toEqual({ text: 'EN:猫', provider: 'on-device', cached: false });
     expect(providers).toEqual(['on-device']);
 
-    const second = await translateSentence('猫', { onlineEnabled: false });
+    const second = await translateSentence('猫', {
+      targetLanguage: 'en',
+      onlineEnabled: false,
+    });
     expect(second).toEqual({ text: 'EN:猫', provider: 'on-device', cached: true });
     expect(translate).toHaveBeenCalledTimes(1);
+  });
+
+  it('TR-TARGET sends the selected language to the on-device translator and caches per target', async () => {
+    const calls: string[] = [];
+    vi.stubGlobal('Translator', {
+      availability: async (options: { targetLanguage: string }) => {
+        calls.push(`availability:${options.targetLanguage}`);
+        return 'available';
+      },
+      create: async (options: { targetLanguage: string }) => {
+        calls.push(`create:${options.targetLanguage}`);
+        return {
+          translate: async (text: string) => `${options.targetLanguage}:${text}`,
+          destroy: () => undefined,
+        };
+      },
+    });
+
+    const french = await translateSentence('猫', {
+      targetLanguage: 'fr',
+      onlineEnabled: false,
+    });
+    expect(french.text).toBe('fr:猫');
+    expect(calls).toEqual(['availability:fr', 'create:fr']);
+
+    const cached = await translateSentence('猫', {
+      targetLanguage: 'fr',
+      onlineEnabled: false,
+    });
+    expect(cached.cached).toBe(true);
+    expect(calls).toEqual(['availability:fr', 'create:fr']);
+
+    const german = await translateSentence('猫', {
+      targetLanguage: 'de',
+      onlineEnabled: false,
+    });
+    expect(german.text).toBe('de:猫');
+    expect(calls).toEqual([
+      'availability:fr',
+      'create:fr',
+      'availability:de',
+      'create:de',
+    ]);
   });
 
   it('TR-PROGRESS forwards on-device download progress', async () => {
@@ -81,6 +128,7 @@ describe('translation providers', () => {
 
     const progress: Array<{ loaded: number; total: number }> = [];
     const result = await translateSentence('猫', {
+      targetLanguage: 'en',
       onlineEnabled: false,
       onProgress: (event) => progress.push(event),
     });
@@ -113,6 +161,7 @@ describe('translation providers', () => {
 
     const providers: string[] = [];
     const result = await translateSentence('猫', {
+      targetLanguage: 'en',
       onlineEnabled: true,
       onProvider: (provider) => providers.push(provider),
     });
@@ -120,7 +169,10 @@ describe('translation providers', () => {
     expect(providers).toEqual(['mymemory']);
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    const cached = await translateSentence('猫', { onlineEnabled: false });
+    const cached = await translateSentence('猫', {
+      targetLanguage: 'en',
+      onlineEnabled: false,
+    });
     expect(cached.cached).toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
@@ -151,10 +203,30 @@ describe('translation providers', () => {
     );
   });
 
+  it('TR-MYMEMORY-TARGET requests the selected language pair', async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      expect(url).toContain('langpair=ja%7Cfr');
+      return new Response(
+        JSON.stringify({
+          responseStatus: 200,
+          responseData: { translatedText: 'Un chat.' },
+        }),
+        { status: 200 },
+      );
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    expect(await mymemoryTranslate('猫', { targetLanguage: 'fr' })).toBe('Un chat.');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('TR-TOO-LONG preserves the too-long error instead of flattening it', async () => {
     vi.stubGlobal('Translator', undefined);
     await expect(
-      translateSentence('あ'.repeat(451), { onlineEnabled: true }),
+      translateSentence('あ'.repeat(451), {
+        targetLanguage: 'en',
+        onlineEnabled: true,
+      }),
     ).rejects.toBeInstanceOf(TranslationTooLongError);
   });
 
@@ -190,11 +262,18 @@ describe('translation providers', () => {
     });
 
     const controller = new AbortController();
-    const first = translateSentence('犬', { onlineEnabled: false, signal: controller.signal });
+    const first = translateSentence('犬', {
+      targetLanguage: 'en',
+      onlineEnabled: false,
+      signal: controller.signal,
+    });
     await vi.waitFor(() => expect(resolvers.length).toBe(1));
 
     controller.abort();
-    const second = translateSentence('犬', { onlineEnabled: false });
+    const second = translateSentence('犬', {
+      targetLanguage: 'en',
+      onlineEnabled: false,
+    });
     await vi.waitFor(() => expect(resolvers.length).toBe(2));
 
     resolvers[0]?.('stale translation');
@@ -210,12 +289,14 @@ describe('translation providers', () => {
 
   it('TR-UNAVAILABLE distinguishes disabled online translation', async () => {
     vi.stubGlobal('Translator', undefined);
-    await expect(translateSentence('猫', { onlineEnabled: false })).rejects.toMatchObject({
+    await expect(
+      translateSentence('猫', { targetLanguage: 'en', onlineEnabled: false }),
+    ).rejects.toMatchObject({
       name: 'TranslationUnavailableError',
       reason: 'online-disabled',
     });
-    await expect(translateSentence('猫', { onlineEnabled: false })).rejects.toBeInstanceOf(
-      TranslationUnavailableError,
-    );
+    await expect(
+      translateSentence('猫', { targetLanguage: 'en', onlineEnabled: false }),
+    ).rejects.toBeInstanceOf(TranslationUnavailableError);
   });
 });

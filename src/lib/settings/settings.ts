@@ -1,4 +1,8 @@
 import type { Settings } from '../types';
+import {
+  DEFAULT_TRANSLATION_TARGET,
+  isTranslationTarget,
+} from '../translate/languages';
 
 export const SETTINGS_KEY = 'jepub:settings:v1';
 
@@ -9,6 +13,7 @@ export const DEFAULT_SETTINGS: Settings = Object.freeze({
   furigana: true,
   furiganaScript: 'katakana',
   onlineTranslation: false,
+  translationTarget: DEFAULT_TRANSLATION_TARGET,
 });
 
 export const MIN_FONT_SIZE = 14;
@@ -39,6 +44,7 @@ function parseSettings(raw: unknown): Settings {
   const furigana = raw['furigana'];
   const furiganaScript = raw['furiganaScript'];
   const onlineTranslation = raw['onlineTranslation'];
+  const translationTarget = raw['translationTarget'];
 
   return {
     theme: theme === 'light' || theme === 'dark' ? theme : DEFAULT_SETTINGS.theme,
@@ -59,6 +65,9 @@ function parseSettings(raw: unknown): Settings {
       typeof onlineTranslation === 'boolean'
         ? onlineTranslation
         : DEFAULT_SETTINGS.onlineTranslation,
+    translationTarget: isTranslationTarget(translationTarget)
+      ? translationTarget
+      : DEFAULT_TRANSLATION_TARGET,
   };
 }
 
@@ -92,6 +101,9 @@ function applyPatch(current: Settings, patch: Partial<Settings>): Settings {
   }
   if (typeof patch.onlineTranslation === 'boolean') {
     next.onlineTranslation = patch.onlineTranslation;
+  }
+  if (isTranslationTarget(patch.translationTarget)) {
+    next.translationTarget = patch.translationTarget;
   }
 
   return next;

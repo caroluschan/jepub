@@ -13,6 +13,7 @@ export interface ApiMockOptions {
 
 interface MockWindow extends Window {
   __spoken?: Array<{ text: string; lang: string }>;
+  __translationTargets?: string[];
 }
 
 export const SAMPLE_EPUB = path.resolve(process.cwd(), 'public/sample/jepub-sample.epub');
@@ -22,6 +23,8 @@ export async function installApiMocks(page: Page, options: ApiMockOptions = {}):
     const scope = window as MockWindow;
     const spoken: Array<{ text: string; lang: string }> = [];
     scope.__spoken = spoken;
+    const translationTargets: string[] = [];
+    scope.__translationTargets = translationTargets;
 
     class MockUtterance {
       text: string;
@@ -75,8 +78,12 @@ export async function installApiMocks(page: Page, options: ApiMockOptions = {}):
 
     const mode = settings.translator ?? 'available';
     (window as unknown as { Translator: unknown }).Translator = {
-      availability: () => Promise.resolve(mode === 'progress' ? 'downloadable' : 'available'),
+      availability: (options: { targetLanguage: string }) => {
+        translationTargets.push(options.targetLanguage);
+        return Promise.resolve(mode === 'progress' ? 'downloadable' : 'available');
+      },
       create: async (init: {
+        targetLanguage?: string;
         monitor?: (monitor: {
           addEventListener: (
             type: string,
@@ -84,6 +91,7 @@ export async function installApiMocks(page: Page, options: ApiMockOptions = {}):
           ) => void;
         }) => void;
       }) => {
+        if (init.targetLanguage !== undefined) translationTargets.push(init.targetLanguage);
         if (mode === 'progress') {
           init.monitor?.({
             addEventListener: (type, listener) => {
@@ -184,6 +192,8 @@ export async function setSettingsBeforeLoad(
   patch: Record<string, unknown>,
 ): Promise<void> {
   await page.addInitScript((settingsPatch: Record<string, unknown>) => {
+    const seedKey = 'jepub:test-settings-seeded';
+    if (window.sessionStorage.getItem(seedKey) === '1') return;
     const key = 'jepub:settings:v1';
     const existing: Record<string, unknown> = {
       theme: 'light',
@@ -192,8 +202,10 @@ export async function setSettingsBeforeLoad(
       furigana: true,
       furiganaScript: 'katakana',
       onlineTranslation: false,
+      translationTarget: 'en',
     };
     window.localStorage.setItem(key, JSON.stringify({ ...existing, ...settingsPatch }));
+    window.sessionStorage.setItem(seedKey, '1');
   }, patch);
 }
 

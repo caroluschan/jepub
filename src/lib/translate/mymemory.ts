@@ -4,12 +4,14 @@ import {
   TranslationTimeoutError,
   TranslationTooLongError,
 } from './errors';
+import { DEFAULT_TRANSLATION_TARGET, getTranslationLanguage } from './languages';
 
 export const MYMEMORY_ENDPOINT = 'https://api.mymemory.translated.net/get';
 export const MYMEMORY_MAX_CHARS = 450;
 export const MYMEMORY_TIMEOUT_MS = 8000;
 
 export interface MyMemoryOptions {
+  targetLanguage?: string;
   signal?: AbortSignal;
   timeoutMs?: number;
 }
@@ -42,8 +44,11 @@ export async function mymemoryTranslate(
   options.signal?.addEventListener('abort', onCallerAbort, { once: true });
 
   try {
+    const target = getTranslationLanguage(
+      options.targetLanguage ?? DEFAULT_TRANSLATION_TARGET,
+    ).myMemoryCode;
     const url = `${MYMEMORY_ENDPOINT}?q=${encodeURIComponent(text)}&langpair=${encodeURIComponent(
-      'ja|en',
+      `ja|${target}`,
     )}`;
     const response = await fetch(url, { signal: controller.signal });
     if (!response.ok) {

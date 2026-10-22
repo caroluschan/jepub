@@ -6,6 +6,7 @@ import {
   routeMyMemory,
   setSettingsBeforeLoad,
   spokenEntries,
+  waitForReader,
 } from './helpers';
 
 test('@sheet-open opens the sentence sheet and restores focus on escape', async ({ page }) => {
@@ -53,6 +54,32 @@ test('@translate-online-fallback falls back to MyMemory when on-device is unavai
   await openSentence(page);
   await expect(page.getByTestId('sentence-translation')).toContainText('I am a cat.');
   await expect(page.getByTestId('translation-provider')).toContainText('MyMemory');
+});
+
+test('@translation-language changes, persists, and requests the selected language', async ({
+  page,
+}) => {
+  await installApiMocks(page, { translator: 'none' });
+  await routeMyMemory(page, 'Un chat.');
+  await setSettingsBeforeLoad(page, { onlineTranslation: true });
+  await importSample(page);
+  await openSentence(page);
+
+  const select = page.getByTestId('translation-language');
+  await expect(select).toHaveValue('en');
+  const frenchRequest = page.waitForRequest((request) =>
+    request.url().includes('langpair=ja%7Cfr'),
+  );
+  await select.selectOption('fr');
+  await expect(select).toHaveValue('fr');
+  await frenchRequest;
+  await expect(page.getByTestId('sentence-translation')).toContainText('Un chat.');
+  await expect(page.getByTestId('translation-provider')).toContainText('MyMemory');
+
+  await page.reload();
+  await waitForReader(page);
+  await openSentence(page);
+  await expect(page.getByTestId('translation-language')).toHaveValue('fr');
 });
 
 test('@translate-disabled offers an explicit enable action and retries', async ({ page }) => {

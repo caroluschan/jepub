@@ -40,7 +40,6 @@ export function useSentenceDetails(sentence: string): SentenceDetails {
     const controller = new AbortController();
     let active = true;
 
-    setTranslation({ status: 'loading', progress: null });
     setRubyHtml(null);
     setRomaji(null);
     setRomajiState('loading');
@@ -60,10 +59,23 @@ export function useSentenceDetails(sentence: string): SentenceDetails {
         setRomajiState('ready');
       })
       .catch(() => {
-        if (active && !controller.signal.aborted) setRomajiState('error');
+        if (!active || controller.signal.aborted) setRomajiState('error');
       });
 
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [sentence, settings.furiganaScript]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+
+    setTranslation({ status: 'loading', progress: null });
+
     void translateSentence(sentence, {
+      targetLanguage: settings.translationTarget,
       onlineEnabled: settings.onlineTranslation,
       signal: controller.signal,
       onProgress: (progress) => {
@@ -105,7 +117,7 @@ export function useSentenceDetails(sentence: string): SentenceDetails {
       active = false;
       controller.abort();
     };
-  }, [sentence, settings.furiganaScript, settings.onlineTranslation, retryCount]);
+  }, [sentence, settings.onlineTranslation, settings.translationTarget, retryCount]);
 
   useEffect(() => {
     if (romajiCount === 0) return;

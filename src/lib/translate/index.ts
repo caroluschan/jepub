@@ -16,6 +16,7 @@ export {
 } from './errors';
 
 export interface TranslateSentenceOptions {
+  targetLanguage: string;
   onlineEnabled: boolean;
   signal?: AbortSignal;
   onProgress?: (progress: { loaded: number; total: number }) => void;
@@ -52,7 +53,7 @@ async function runTranslation(
 
   let onDevice: string | null = null;
   try {
-    onDevice = await translateOnDevice(text, options.onProgress);
+    onDevice = await translateOnDevice(text, options.targetLanguage, options.onProgress);
   } catch {
     onDevice = null;
   }
@@ -74,7 +75,10 @@ async function runTranslation(
 
   let online: string;
   try {
-    online = await mymemoryTranslate(text, { signal: options.signal });
+    online = await mymemoryTranslate(text, {
+      targetLanguage: options.targetLanguage,
+      signal: options.signal,
+    });
   } catch (error) {
     if (error instanceof TranslationAbortedError) throw error;
     // A too-long sentence is actionable in the UI (specific message, no
@@ -94,7 +98,7 @@ export async function translateSentence(
   text: string,
   options: TranslateSentenceOptions,
 ): Promise<TranslationResult> {
-  const key = await translationKey(text);
+  const key = await translationKey(text, options.targetLanguage);
 
   let cached: Awaited<ReturnType<typeof getCachedTranslation>> = null;
   try {

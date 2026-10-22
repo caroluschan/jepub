@@ -1,4 +1,4 @@
-let translatorPromise: Promise<TranslatorInstance | null> | null = null;
+const translatorPromises = new Map<string, Promise<TranslatorInstance | null>>();
 
 function getTranslatorApi(): TranslatorApi | undefined {
   const scope = globalThis as typeof globalThis & { Translator?: TranslatorApi };
@@ -7,19 +7,24 @@ function getTranslatorApi(): TranslatorApi | undefined {
 
 export async function translateOnDevice(
   text: string,
+  targetLanguage: string,
   onProgress?: (progress: TranslatorDownloadProgress) => void,
 ): Promise<string | null> {
   const api = getTranslatorApi();
   if (api === undefined) return null;
 
-  const availability = await api.availability({ sourceLanguage: 'ja', targetLanguage: 'en' });
+  const availability = await api.availability({
+    sourceLanguage: 'ja',
+    targetLanguage,
+  });
   if (availability === 'unavailable') return null;
 
-  if (translatorPromise === null) {
+  let translatorPromise = translatorPromises.get(targetLanguage);
+  if (translatorPromise === undefined) {
     translatorPromise = api
       .create({
         sourceLanguage: 'ja',
-        targetLanguage: 'en',
+        targetLanguage,
         monitor: (monitor) => {
           monitor.addEventListener('downloadprogress', (event) => {
             onProgress?.({ loaded: event.loaded, total: event.total });
@@ -27,9 +32,10 @@ export async function translateOnDevice(
         },
       })
       .catch((error: unknown) => {
-        translatorPromise = null;
+        translatorPromises.delete(targetLanguage);
         throw error;
       });
+    translatorPromises.set(targetLanguage, translatorPromise);
   }
 
   const translator = await translatorPromise;
@@ -38,9 +44,8 @@ export async function translateOnDevice(
 }
 
 export async function destroyOnDeviceTranslator(): Promise<void> {
-  const pending = translatorPromise;
-  translatorPromise = null;
-  if (pending === null) return;
-  const translator = await pending.catch(() => null);
-  translator?.destroy();
+  const pending = Array.from(translatorPromises.values());
+  translatorPromises.clear();
+  const translators = await Promise.all(pending.map((promise) => promise.catch(() => null)));
+  for (const translator of translators) translator?.destroy();
 }

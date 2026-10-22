@@ -31,11 +31,17 @@ afterEach(async () => {
 });
 
 describe('translation cache key and cache', () => {
-  it('TR-CACHE-KEY hashes v1|en|text with SHA-256', async () => {
+  it('TR-CACHE-KEY hashes v1|<target>|text with SHA-256', async () => {
     const expected = createHash('sha256').update('v1|en|日本語').digest('hex');
     expect(await translationKey('日本語')).toBe(expected);
     expect(await translationKey('日本語')).toBe(await translationKey('日本語'));
     expect(await translationKey('英語')).not.toBe(await translationKey('日本語'));
+
+    const french = createHash('sha256').update('v1|fr|日本語').digest('hex');
+    expect(await translationKey('日本語', 'fr')).toBe(french);
+    expect(await translationKey('日本語', 'fr')).not.toBe(
+      await translationKey('日本語', 'de'),
+    );
   });
 
   it('TR-CACHE-HIT returns a cached translation without touching providers', async () => {
@@ -48,6 +54,7 @@ describe('translation cache key and cache', () => {
 
     const onProvider = vi.fn();
     const result = await translateSentence(CACHE_TEXT, {
+      targetLanguage: 'en',
       onlineEnabled: false,
       onProvider,
     });

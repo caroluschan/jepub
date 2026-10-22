@@ -19,9 +19,11 @@ describe('settings', () => {
       furigana: true,
       furiganaScript: 'katakana',
       onlineTranslation: false,
+      translationTarget: 'en',
     });
     expect(DEFAULT_SETTINGS.onlineTranslation).toBe(false);
     expect(DEFAULT_SETTINGS.furiganaScript).toBe('katakana');
+    expect(DEFAULT_SETTINGS.translationTarget).toBe('en');
   });
 
   it('SET-CORRUPT ignores invalid JSON and invalid individual keys', () => {
@@ -67,6 +69,14 @@ describe('settings', () => {
 
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ furiganaScript: 'romaji' }));
     expect(loadSettings().furiganaScript).toBe('katakana');
+  });
+
+  it('SET-TARGET persists a supported target and rejects an unknown one', () => {
+    saveSettings({ translationTarget: 'fr' });
+    expect(loadSettings().translationTarget).toBe('fr');
+
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ translationTarget: 'xx' }));
+    expect(loadSettings().translationTarget).toBe('en');
   });
 
   it('SET-CLAMP clamps font size to 14..32 and rejects non-numbers', () => {

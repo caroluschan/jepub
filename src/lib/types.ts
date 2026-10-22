@@ -9,6 +9,7 @@ export interface Settings {
   furigana: boolean;
   furiganaScript: FuriganaScript;
   onlineTranslation: boolean;
+  translationTarget: string;
 }
 
 export interface BookProgress {
