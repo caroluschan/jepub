@@ -10,6 +10,13 @@ export type ByotProviderId =
   | 'openrouter'
   | 'groq'
   | 'mistral'
+  | 'deepseek'
+  | 'xai'
+  | 'together'
+  | 'cerebras'
+  | 'perplexity'
+  | 'fireworks'
+  | 'qwen'
   | 'custom';
 
 export interface Settings {

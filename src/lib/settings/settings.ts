@@ -94,6 +94,13 @@ function parseSettings(raw: unknown): Settings {
       aiProvider === 'openrouter' ||
       aiProvider === 'groq' ||
       aiProvider === 'mistral' ||
+      aiProvider === 'deepseek' ||
+      aiProvider === 'xai' ||
+      aiProvider === 'together' ||
+      aiProvider === 'cerebras' ||
+      aiProvider === 'perplexity' ||
+      aiProvider === 'fireworks' ||
+      aiProvider === 'qwen' ||
       aiProvider === 'custom'
         ? aiProvider
         : DEFAULT_SETTINGS.aiProvider,
@@ -153,6 +160,13 @@ function applyPatch(current: Settings, patch: Partial<Settings>): Settings {
     patch.aiProvider === 'openrouter' ||
     patch.aiProvider === 'groq' ||
     patch.aiProvider === 'mistral' ||
+    patch.aiProvider === 'deepseek' ||
+    patch.aiProvider === 'xai' ||
+    patch.aiProvider === 'together' ||
+    patch.aiProvider === 'cerebras' ||
+    patch.aiProvider === 'perplexity' ||
+    patch.aiProvider === 'fireworks' ||
+    patch.aiProvider === 'qwen' ||
     patch.aiProvider === 'custom'
   ) {
     next.aiProvider = patch.aiProvider;

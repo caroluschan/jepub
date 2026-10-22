@@ -6,6 +6,8 @@ describe('BYOT provider configuration', () => {
     expect(getByotProvider('openai').baseUrl).toBe('https://api.openai.com/v1');
     expect(getByotProvider('openai').defaultModel.length).toBeGreaterThan(0);
     expect(getByotProvider('custom').baseUrl).toBe('');
+    expect(getByotProvider('deepseek').baseUrl).toBe('https://api.deepseek.com/v1');
+    expect(getByotProvider('deepseek').defaultModel).toBe('deepseek-chat');
   });
 
   it('BYOT-BASE normalizes custom base URLs and rejects invalid values', () => {
