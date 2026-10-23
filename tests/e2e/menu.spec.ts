@@ -7,6 +7,7 @@ test('@menu contains library actions and opens the saved chat room', async ({ pa
 
   await expect(page.getByTestId('menu-chat')).toBeVisible();
   await expect(page.getByTestId('menu-mypedia')).toBeVisible();
+  await expect(page.getByTestId('menu-guide')).toBeVisible();
   await expect(page.getByTestId('menu-quiz')).toHaveCount(0);
   await expect(page.getByTestId('menu-settings')).toBeVisible();
   await expect(page.getByTestId('menu-add-book')).toBeVisible();
@@ -34,4 +35,18 @@ test('@ai-chat-off keeps the entry and deep-links to AI settings', async ({ page
     .toBeGreaterThan(100);
   await page.getByTestId('settings-close').click();
   await expect(page.getByTestId('chat-index')).toBeVisible();
+});
+
+
+test('@guide has a jump list and tutorial sections', async ({ page }) => {
+  await gotoLibrary(page);
+  await openAppMenu(page);
+  await page.getByTestId('menu-guide').click();
+  await expect(page.getByTestId('guide-page')).toBeVisible();
+  await expect(page.getByTestId('guide-toc')).toBeVisible();
+  await page.getByTestId('guide-toc').getByRole('button', { name: 'Add books' }).click();
+  await expect(page.locator('#guide-add')).toBeVisible();
+  await page.getByTestId('guide-toc').getByRole('button', { name: 'AI Chat' }).click();
+  await expect(page.getByTestId('guide-page')).toBeVisible();
+  await expect(page.locator('#guide-chat')).toBeVisible();
 });

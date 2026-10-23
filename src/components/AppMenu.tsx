@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Icon } from './Icon';
 import { Modal } from './Modal';
 import { useI18n } from '../lib/i18n/useI18n';
-import { navigateToChatRoom, navigateToMyPedia, navigateToQuiz } from '../lib/router';
+import { navigateToChatRoom, navigateToGuide, navigateToMyPedia, navigateToQuiz } from '../lib/router';
 import { useSettings } from '../features/settings/SettingsProvider';
 import { useLlm } from '../features/ai/LlmProvider';
 
@@ -43,6 +43,11 @@ export function AppMenu({ onAddBook }: AppMenuProps) {
   const openQuiz = (): void => {
     close();
     navigateToQuiz();
+  };
+
+  const openGuide = (): void => {
+    close();
+    navigateToGuide();
   };
 
   const toggleTheme = (): void => {
@@ -123,6 +128,10 @@ export function AppMenu({ onAddBook }: AppMenuProps) {
             <button type="button" className="app-menu__item" data-testid="menu-settings" onClick={openSettingsPage}>
               <Icon name="gear" />
               <span>{t('Settings')}</span>
+            </button>
+            <button type="button" className="app-menu__item" data-testid="menu-guide" onClick={openGuide}>
+              <Icon name="guide" />
+              <span>{t('Guide')}</span>
             </button>
           </nav>
         </Modal>

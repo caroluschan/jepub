@@ -3,7 +3,8 @@ export type Route =
   | { name: 'reader'; bookId: string }
   | { name: 'chat'; sessionId: string | null }
   | { name: 'mypedia' }
-  | { name: 'quiz' };
+  | { name: 'quiz' }
+  | { name: 'guide' };
 
 const LIBRARY: Route = { name: 'library' };
 
@@ -21,6 +22,7 @@ export function parseRoute(hash: string): Route | null {
 
   if (segments[0] === 'mypedia') return { name: 'mypedia' };
   if (segments[0] === 'quiz') return { name: 'quiz' };
+  if (segments[0] === 'guide') return { name: 'guide' };
 
   if (segments[0] === 'chat') {
     if (segments[1] === undefined) return { name: 'chat', sessionId: null };
@@ -67,4 +69,8 @@ export function navigateToMyPedia(): void {
 
 export function navigateToQuiz(): void {
   window.location.hash = '#/quiz';
+}
+
+export function navigateToGuide(): void {
+  window.location.hash = '#/guide';
 }

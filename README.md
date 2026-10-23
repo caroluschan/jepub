@@ -24,7 +24,11 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
   <img src="assets/readme/quiz.png" width="230" alt="AI-generated multiple-choice quiz with Japanese context and result">
 </p>
 
-<p align="center"><sub>Phone-sized screenshots use the bundled public-domain sample book. AI screenshots use a demo provider configuration.</sub></p>
+<p align="center">
+  <img src="assets/readme/guide.png" width="230" alt="In-app Guide with a table of contents and tutorial sections">
+</p>
+
+<p align="center"><sub>Phone-sized screenshots use the bundled public-domain sample book. AI screenshots use a demo provider configuration. The Guide includes a table of contents and links to each topic.</sub></p>
 
 ## Features
 
@@ -42,13 +46,17 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Books, covers, chapters, reading positions, translated sentences, chat sessions, and MyPedia records are stored locally in IndexedDB.
 - JEPUB asks the browser for persistent storage, so your shelf survives ordinary browser restarts.
 
+**Guide**
+- A newbie-friendly in-app tour with sections for importing, reading, sentence tools, AI setup, AI Chat, MyPedia, Quiz, privacy, and troubleshooting.
+- Includes phone screenshots and a jump list at the top.
+
 **Find a book**
 - Use the **Filters** button to reveal search and filters only when needed.
 - Search by book title or author; filter by author, source, or reading status.
 - The active-filter count stays visible, and a one-tap **Clear filters** action resets everything.
 
 **A single menu**
-- The library header has one menu ordered **Add book**, **AI Chat**, **MyPedia**, **Quiz**, **Settings**; the light/dark toggle sits beside the close button.
+- The library header has one menu ordered **Add book**, **AI Chat**, **MyPedia**, **Quiz**, **Settings**, **Guide**; the light/dark toggle sits beside the close button.
 - **AI Chat** lists saved conversations on this device; open any previous chat, start a new one, or delete old ones.
 - Saved conversations remain readable even when AI is Off or BYOT is offline.
 

@@ -3,6 +3,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider } from './components/Toast';
 import { ChatIndexPage } from './features/chat/ChatIndexPage';
 import { ChatPage } from './features/chat/ChatPage';
+import { GuidePage } from './features/guide/GuidePage';
 import { MyPediaPage } from './features/mypedia/MyPediaPage';
 import { QuizPage } from './features/quiz/QuizPage';
 import { LibraryPage } from './features/library/LibraryPage';
@@ -49,6 +50,8 @@ function AppShell() {
         <MyPediaPage />
       ) : route.name === 'quiz' ? (
         <QuizPage />
+      ) : route.name === 'guide' ? (
+        <GuidePage />
       ) : (
         <LibraryPage />
       )}

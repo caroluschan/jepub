@@ -13,6 +13,7 @@ import './styles/ai.css';
 import './styles/chat.css';
 import './styles/menu.css';
 import './styles/knowledge.css';
+import './styles/guide.css';
 
 const container = document.getElementById('root');
 if (container === null) {
