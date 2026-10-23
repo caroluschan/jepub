@@ -87,3 +87,58 @@ test('@settings-page keeps reader controls working after closing', async ({ page
   await waitForReader(page);
   await expect(page.getByTestId('settings-page')).toHaveCount(0);
 });
+
+test('@ai-key-help shows provider-specific console steps', async ({ page }) => {
+  await setSettingsBeforeLoad(page, {
+    aiMode: 'byot',
+    aiProvider: 'deepseek',
+    aiApiKey: 'test-key',
+    aiModel: 'deepseek-chat',
+  });
+  await gotoLibrary(page);
+  await openSettingsFromMenu(page);
+  await page.getByTestId('ai-key-help').click();
+  const help = page.getByTestId('api-key-help');
+  await expect(help).toBeVisible();
+  await expect(help).toContainText('DeepSeek');
+  await expect(help).toContainText('Create API key');
+  await expect(help.getByRole('link', { name: 'Open provider console' })).toHaveAttribute(
+    'href',
+    'https://platform.deepseek.com/api_keys',
+  );
+  await help.getByRole('button', { name: 'Close' }).click();
+  await expect(help).toBeHidden();
+});
+
+test('@ai-test reports a working BYOT connection', async ({ page }) => {
+  await setSettingsBeforeLoad(page, {
+    aiMode: 'byot',
+    aiProvider: 'custom',
+    aiApiKey: 'test-key',
+    aiModel: 'test-model',
+    aiBaseUrl: 'https://example.test/v1',
+  });
+  await page.route('https://example.test/v1/chat/completions', async (route) => {
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({
+        status: 204,
+        headers: {
+          'access-control-allow-origin': '*',
+          'access-control-allow-methods': 'POST, OPTIONS',
+          'access-control-allow-headers': 'content-type, authorization',
+        },
+      });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'text/event-stream',
+      headers: { 'access-control-allow-origin': '*' },
+      body: 'data: {"choices":[{"delta":{"content":"OK"}}]}\n\ndata: [DONE]\n\n',
+    });
+  });
+  await gotoLibrary(page);
+  await openSettingsFromMenu(page);
+  await page.getByTestId('ai-test').getByRole('button', { name: 'Test AI' }).click();
+  await expect(page.getByTestId('ai-test-result')).toContainText('AI service works.');
+});

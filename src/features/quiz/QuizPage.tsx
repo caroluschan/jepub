@@ -19,6 +19,7 @@ export function QuizPage() {
   const llm = useLlm();
   const [records, setRecords] = useState<KnowledgeRecord[]>([]);
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
+  const [contextRecord, setContextRecord] = useState<KnowledgeRecord | null>(null);
   const [state, setState] = useState<QuizState>('idle');
   const [selected, setSelected] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +59,7 @@ export function QuizPage() {
     const record = pool[Math.floor(Math.random() * pool.length)] ?? records[0];
     if (record === undefined) return;
     currentIdRef.current = record.id;
+    setContextRecord(record);
     try {
       const raw = await llm.generate(
         [newMessage('user', buildQuizPrompt(record, language))],
@@ -108,7 +110,7 @@ export function QuizPage() {
           <div className="quiz-page__gate">
             <h2>{t('Quiz needs an AI service.')}</h2>
             <p>{t('Enable AI in Settings to use the quiz.')}</p>
-            <button type="button" className="button" onClick={() => openSettings()}>
+            <button type="button" className="button" onClick={() => openSettings(undefined, 'ai')}>
               {t('Open AI settings')}
             </button>
           </div>
@@ -127,7 +129,7 @@ export function QuizPage() {
           <div className="quiz-page__gate">
             <h2>{t('The quiz needs an internet connection.')}</h2>
             <p>{t('Enable AI in Settings to use the quiz.')}</p>
-            <button type="button" className="button" onClick={() => openSettings()}>
+            <button type="button" className="button" onClick={() => openSettings(undefined, 'ai')}>
               {t('Open AI settings')}
             </button>
           </div>
@@ -169,6 +171,16 @@ export function QuizPage() {
           <section className="quiz-card" aria-live="polite">
             <p className="label">{t('Question')}</p>
             <h2 className="quiz-card__question">{question.question}</h2>
+            {contextRecord !== null ? (
+              <>
+                <p className="quiz-card__context" lang="ja">
+                  {contextRecord.sentence}
+                </p>
+                {contextRecord.translation !== undefined ? (
+                  <p className="quiz-card__translation">{contextRecord.translation}</p>
+                ) : null}
+              </>
+            ) : null}
             <div className="quiz-options">
               {question.options.map((option, index) => {
                 const answered = selected !== null;

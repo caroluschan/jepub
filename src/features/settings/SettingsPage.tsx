@@ -133,7 +133,7 @@ function FuriganaStatusLine({ status }: { status: FuriganaStatus }) {
 }
 
 export function SettingsPage() {
-  const { settings, updateSettings, closeSettings, settingsTrigger } = useSettings();
+  const { settings, updateSettings, closeSettings, settingsTrigger, settingsSection } = useSettings();
   const { t } = useI18n();
   const { push } = useToast();
   const closeRef = useRef<HTMLButtonElement | null>(null);
@@ -141,6 +141,14 @@ export function SettingsPage() {
   const storage = useStorageState();
 
   useEffect(() => onFuriganaStatusChange(setStatus), []);
+
+  useEffect(() => {
+    if (settingsSection !== 'ai') return;
+    const timer = window.setTimeout(() => {
+      document.getElementById('settings-ai')?.scrollIntoView({ block: 'start' });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [settingsSection]);
 
   const setFontSize = (value: number): void => {
     updateSettings({ fontSize: Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, value)) });

@@ -127,3 +127,25 @@
   font-size: 14px;
   line-height: 1.5;
 }
+
+.chat-index__setup {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-3) clamp(16px, 4vw, 28px) calc(var(--space-3) + var(--safe-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.chat-index__setup p {
+  max-width: 52ch;
+  color: var(--muted);
+  font-family: var(--font-english);
+  font-size: 13px;
+  line-height: 1.5;
+}

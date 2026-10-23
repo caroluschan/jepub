@@ -91,7 +91,7 @@ export function AppMenu({ onAddBook }: AppMenuProps) {
           <nav className="app-menu__list" aria-label={t('Menu')}>
             <button type="button" className="app-menu__item" data-testid="menu-chat" onClick={openChatRoom}>
               <Icon name="chat" />
-              <span>{t('Chat room')}</span>
+              <span>{t('AI Chat')}</span>
             </button>
             <button type="button" className="app-menu__item" data-testid="menu-mypedia" onClick={openMyPedia}>
               <Icon name="book" />

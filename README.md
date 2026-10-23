@@ -7,22 +7,30 @@
 JEPUB is a small, monochrome reading room for Japanese books. It keeps your library on your device, puts readings above kanji, and lets you tap any sentence to see how it sounds, what it means, and hear it spoken aloud. When you want to go deeper, an optional AI study companion can explain the grammar, remember what you learned, and quiz you on it.
 
 <p align="center">
-  <img src="assets/readme/library.png" width="250" alt="JEPUB library with a book cover">
-  <img src="assets/readme/reader-vertical.png" width="250" alt="Vertical Japanese text with katakana furigana">
-  <img src="assets/readme/sentence.png" width="250" alt="Sentence panel with ruby, romaji, translation, and playback">
+  <img src="assets/readme/library.png" width="230" alt="JEPUB library with a book cover and hamburger menu">
+  <img src="assets/readme/sentence.png" width="230" alt="Sentence panel with translation, MyPedia, and Ask AI actions">
+  <img src="assets/readme/reader-vertical.png" width="230" alt="Vertical Japanese text with katakana furigana">
 </p>
 
 <p align="center">
-  <img src="assets/readme/settings.png" width="620" alt="JEPUB settings page with appearance, reading, translation, storage, and about sections">
+  <img src="assets/readme/menu.png" width="230" alt="JEPUB hamburger menu with AI Chat, MyPedia, Quiz, Settings, Add book, and theme">
+  <img src="assets/readme/ai-chat.png" width="230" alt="AI Chat setup prompt when AI is off">
+  <img src="assets/readme/ai-settings.png" width="230" alt="AI settings with BYOT provider, API key, model, and Test AI">
 </p>
 
-<p align="center"><sub>Screenshots use the bundled public-domain sample book.</sub></p>
+<p align="center">
+  <img src="assets/readme/ai-key-help.png" width="230" alt="Provider-specific API key help modal">
+  <img src="assets/readme/mypedia.png" width="230" alt="MyPedia learning summary records">
+  <img src="assets/readme/quiz.png" width="230" alt="AI-generated multiple-choice quiz with Japanese context and result">
+</p>
+
+<p align="center"><sub>Phone-sized screenshots use the bundled public-domain sample book. AI screenshots use a demo provider configuration.</sub></p>
 
 ## Features
 
 **AI-powered learning**
 - **Ask AI** about any sentence for a grammar breakdown and natural translation.
-- Continue the conversation in a local **Chat room** with saved history.
+- Continue the conversation in a local **AI Chat** with saved history.
 - **MyPedia** turns AI exchanges into concise learning summaries and lets you save checked translations as study records.
 - **Quiz** turns a random MyPedia record into an AI-generated multiple-choice question in your interface language.
 - Use **BYOT** with your own provider key or a gated **Local** model. Turn AI **Off** to hide the AI-only study tools.
@@ -35,8 +43,8 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - JEPUB asks the browser for persistent storage, so your shelf survives ordinary browser restarts.
 
 **A single menu**
-- The library header has one menu for **Chat room**, **MyPedia**, **Quiz**, **Settings**, **Add book**, and the light/dark theme.
-- **Chat room** lists saved conversations on this device; open any previous chat, start a new one, or delete old ones.
+- The library header has one menu for **AI Chat**, **MyPedia**, **Quiz**, **Settings**, **Add book**, and the light/dark theme.
+- **AI Chat** lists saved conversations on this device; open any previous chat, start a new one, or delete old ones.
 - Saved conversations remain readable even when AI is Off or BYOT is offline.
 
 **A reader made for Japanese**
@@ -65,6 +73,9 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Play or stop the sentence with a Japanese (`ja-JP`) voice.
 
 **AI-powered help, three ways**
+- Set up AI from **AI Chat** or Settings; AI Chat stays in the menu even while AI is Off and links directly to the AI settings section.
+- The **?** beside **API key** opens provider-specific steps with links to the official console and documentation for that provider.
+- **Test AI** checks the selected provider/model with a tiny request before you rely on it.
 - Choose **Off**, **BYOT** (bring your own token), or **Local** in Settings.
 - **BYOT** calls the provider you choose directly: OpenAI, Anthropic, Google Gemini, OpenRouter, Groq, Mistral, DeepSeek, xAI, Together AI, Cerebras, Perplexity, Fireworks AI, Qwen/DashScope, or a custom OpenAI-compatible endpoint.
 - BYOT keeps the API key in this browser, fetches the provider's current model list when possible, and always allows a manually typed model ID when the catalog changes.

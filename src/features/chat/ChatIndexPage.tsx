@@ -6,10 +6,14 @@ import { newChatSession } from '../../lib/chat/session';
 import { deleteChatSession, listChatSessions, putChatSession } from '../../lib/storage/db';
 import type { ChatSession } from '../../lib/types';
 import { navigateToChat, navigateToLibrary } from '../../lib/router';
+import { useSettings } from '../settings/SettingsProvider';
+import { useLlm } from '../ai/LlmProvider';
 
 export function ChatIndexPage() {
   const { t } = useI18n();
   const { push } = useToast();
+  const { openSettings } = useSettings();
+  const llm = useLlm();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,7 +61,7 @@ export function ChatIndexPage() {
         </button>
         <div className="chat-page__heading">
           <span className="label">{t('AI chat')}</span>
-          <h1 className="chat-page__title">{t('Chat room')}</h1>
+          <h1 className="chat-page__title">{t('AI Chat')}</h1>
         </div>
         <div className="chat-page__header-actions">
           <button type="button" className="button--text" onClick={startNewChat}>
@@ -103,6 +107,18 @@ export function ChatIndexPage() {
           </div>
         )}
       </main>
+      {llm.mode === 'off' ? (
+        <div className="chat-index__setup" data-testid="ai-chat-setup">
+          <p>{t('AI is off. Choose BYOT or Local in Settings.')}</p>
+          <button
+            type="button"
+            className="button"
+            onClick={() => openSettings(undefined, 'ai')}
+          >
+            {t('Open AI settings')}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Icon } from '../../components/Icon';
 import { useToast } from '../../components/Toast';
 import { useI18n } from '../../lib/i18n/useI18n';
 import { BYOT_PROVIDERS, fetchByotModels, getByotProvider } from '../../lib/llm/byot';
@@ -6,6 +7,8 @@ import type { AiMode, ByotProviderId } from '../../lib/types';
 import { useSettings } from '../settings/SettingsProvider';
 import { useLlm } from './LlmProvider';
 import { AiConsentDialog } from './AiConsentDialog';
+import { ApiKeyHelpDialog } from './ApiKeyHelpDialog';
+import { newMessage } from '../../lib/chat/session';
 
 export function AiSettingsSection() {
   const { settings, updateSettings } = useSettings();
@@ -16,12 +19,19 @@ export function AiSettingsSection() {
   const [models, setModels] = useState<string[]>([]);
   const [modelsState, setModelsState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [modelsError, setModelsError] = useState<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   const provider = getByotProvider(settings.aiProvider);
   const localAvailable = llm.support?.supported === true;
   const mode: AiMode = settings.aiMode === 'local' && !localAvailable ? 'off' : settings.aiMode;
   const isLocal = mode === 'local';
   const isByot = mode === 'byot';
+  const canTest =
+    mode === 'local'
+      ? settings.llmConsent
+      : mode === 'byot' && llm.byotConfigured && llm.online;
 
   useEffect(() => {
     if (!isByot) return;
@@ -213,9 +223,20 @@ export function AiSettingsSection() {
               </>
             ) : null}
 
-            <label className="settings-row__title" htmlFor="ai-api-key">
-              {t('API key')}
-            </label>
+            <div className="settings-row">
+              <label className="settings-row__title" htmlFor="ai-api-key">
+                {t('API key')}
+              </label>
+              <button
+                type="button"
+                className="icon-button"
+                aria-label={t('How to get an API key')}
+                data-testid="ai-key-help"
+                onClick={() => setHelpOpen(true)}
+              >
+                <Icon name="help" size={17} />
+              </button>
+            </div>
             <input
               id="ai-api-key"
               className="settings-input"
@@ -304,7 +325,50 @@ export function AiSettingsSection() {
             ) : null}
           </div>
         ) : null}
+
+        {canTest ? (
+          <div className="ai-test" data-testid="ai-test">
+            <button
+              type="button"
+              className="button button--quiet settings-retry"
+              disabled={testing}
+              onClick={() => {
+                setTesting(true);
+                setTestResult(null);
+                void llm
+                  .generate(
+                    [newMessage('user', 'Reply with exactly: OK')],
+                    () => undefined,
+                    20,
+                  )
+                  .then(() => setTestResult({ ok: true, message: t('AI service works.') }))
+                  .catch((cause: unknown) =>
+                    setTestResult({
+                      ok: false,
+                      message:
+                        cause instanceof Error ? cause.message : t('AI test failed.'),
+                    }),
+                  )
+                  .finally(() => setTesting(false));
+              }}
+            >
+              {testing ? t('Testing…') : t('Test AI')}
+            </button>
+            {testResult !== null ? (
+              <p
+                className={`ai-test__result ${testResult.ok ? 'ai-test__result--ok' : 'ai-test__result--error'}`}
+                data-testid="ai-test-result"
+              >
+                {testResult.message}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
       </div>
+
+      {helpOpen ? (
+        <ApiKeyHelpDialog provider={settings.aiProvider} onClose={() => setHelpOpen(false)} />
+      ) : null}
 
       {consentOpen ? (
         <AiConsentDialog

@@ -100,7 +100,7 @@ export function ChatPage({ sessionId }: ChatPageProps) {
     if (text.length === 0 || sending || session === null) return;
     if (offlineByot) return;
     if (isByot && !llm.byotConfigured) {
-      openSettings();
+      openSettings(undefined, 'ai');
       return;
     }
     if (isLocal && !settings.llmConsent) {
@@ -280,14 +280,14 @@ export function ChatPage({ sessionId }: ChatPageProps) {
       {llm.mode === 'off' ? (
         <div className="chat-page__composer-gate" data-testid="chat-composer-gate">
           <p>{t('AI is off. Choose BYOT or Local in Settings.')}</p>
-          <button type="button" className="button" onClick={() => openSettings()}>
+          <button type="button" className="button" onClick={() => openSettings(undefined, 'ai')}>
             {t('Open AI settings')}
           </button>
         </div>
       ) : isByot && !llm.byotConfigured ? (
         <div className="chat-page__composer-gate" data-testid="chat-composer-gate">
           <p>{t('Set up BYOT in Settings.')}</p>
-          <button type="button" className="button" onClick={() => openSettings()}>
+          <button type="button" className="button" onClick={() => openSettings(undefined, 'ai')}>
             {t('Open AI settings')}
           </button>
         </div>

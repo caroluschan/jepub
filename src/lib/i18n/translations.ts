@@ -253,6 +253,7 @@ export const ENGLISH_SOURCES = [
   'Menu',
   'Close menu',
   'Chat room',
+  'AI Chat',
   'Loading chats…',
   '+ MyPedia',
   'Added to MyPedia.',
@@ -281,6 +282,15 @@ export const ENGLISH_SOURCES = [
   'The quiz needs an internet connection.',
   'Question',
   'Add to MyPedia',
+  'How to get an API key',
+  'Get your {provider} API key',
+  'Open provider console',
+  'Read official documentation',
+  'Close',
+  'Test AI',
+  'Testing…',
+  'AI service works.',
+  'AI test failed.',
 ] as const;
 
 export type TranslationKey = (typeof ENGLISH_SOURCES)[number];
@@ -558,6 +568,7 @@ const ja: Dictionary = {
   'Menu': 'Menu',
   'Close menu': 'Close menu',
   'Chat room': 'Chat room',
+  'AI Chat': 'AI Chat',
 
   'Loading chats…': 'Loading chats…',
 
@@ -588,6 +599,16 @@ const ja: Dictionary = {
   'The quiz needs an internet connection.': 'The quiz needs an internet connection.',
   'Question': 'Question',
   'Add to MyPedia': 'Add to MyPedia',
+
+  'How to get an API key': 'How to get an API key',
+  'Get your {provider} API key': 'Get your {provider} API key',
+  'Open provider console': 'Open provider console',
+  'Read official documentation': 'Read official documentation',
+  'Close': 'Close',
+  'Test AI': 'Test AI',
+  'Testing…': 'Testing…',
+  'AI service works.': 'AI service works.',
+  'AI test failed.': 'AI test failed.',
 
 };
 
@@ -858,6 +879,7 @@ const zhCN: Dictionary = {
   'Menu': 'Menu',
   'Close menu': 'Close menu',
   'Chat room': 'Chat room',
+  'AI Chat': 'AI Chat',
 
   'Loading chats…': 'Loading chats…',
 
@@ -888,6 +910,16 @@ const zhCN: Dictionary = {
   'The quiz needs an internet connection.': 'The quiz needs an internet connection.',
   'Question': 'Question',
   'Add to MyPedia': 'Add to MyPedia',
+
+  'How to get an API key': 'How to get an API key',
+  'Get your {provider} API key': 'Get your {provider} API key',
+  'Open provider console': 'Open provider console',
+  'Read official documentation': 'Read official documentation',
+  'Close': 'Close',
+  'Test AI': 'Test AI',
+  'Testing…': 'Testing…',
+  'AI service works.': 'AI service works.',
+  'AI test failed.': 'AI test failed.',
 
 };
 
@@ -1158,6 +1190,7 @@ const zhTW: Dictionary = {
   'Menu': 'Menu',
   'Close menu': 'Close menu',
   'Chat room': 'Chat room',
+  'AI Chat': 'AI Chat',
 
   'Loading chats…': 'Loading chats…',
 
@@ -1188,6 +1221,16 @@ const zhTW: Dictionary = {
   'The quiz needs an internet connection.': 'The quiz needs an internet connection.',
   'Question': 'Question',
   'Add to MyPedia': 'Add to MyPedia',
+
+  'How to get an API key': 'How to get an API key',
+  'Get your {provider} API key': 'Get your {provider} API key',
+  'Open provider console': 'Open provider console',
+  'Read official documentation': 'Read official documentation',
+  'Close': 'Close',
+  'Test AI': 'Test AI',
+  'Testing…': 'Testing…',
+  'AI service works.': 'AI service works.',
+  'AI test failed.': 'AI test failed.',
 
 };
 
@@ -1458,6 +1501,7 @@ const ko: Dictionary = {
   'Menu': 'Menu',
   'Close menu': 'Close menu',
   'Chat room': 'Chat room',
+  'AI Chat': 'AI Chat',
 
   'Loading chats…': 'Loading chats…',
 
@@ -1488,6 +1532,16 @@ const ko: Dictionary = {
   'The quiz needs an internet connection.': 'The quiz needs an internet connection.',
   'Question': 'Question',
   'Add to MyPedia': 'Add to MyPedia',
+
+  'How to get an API key': 'How to get an API key',
+  'Get your {provider} API key': 'Get your {provider} API key',
+  'Open provider console': 'Open provider console',
+  'Read official documentation': 'Read official documentation',
+  'Close': 'Close',
+  'Test AI': 'Test AI',
+  'Testing…': 'Testing…',
+  'AI service works.': 'AI service works.',
+  'AI test failed.': 'AI test failed.',
 
 };
 
@@ -1758,6 +1812,7 @@ const es: Dictionary = {
   'Menu': 'Menu',
   'Close menu': 'Close menu',
   'Chat room': 'Chat room',
+  'AI Chat': 'AI Chat',
 
   'Loading chats…': 'Loading chats…',
 
@@ -1788,6 +1843,16 @@ const es: Dictionary = {
   'The quiz needs an internet connection.': 'The quiz needs an internet connection.',
   'Question': 'Question',
   'Add to MyPedia': 'Add to MyPedia',
+
+  'How to get an API key': 'How to get an API key',
+  'Get your {provider} API key': 'Get your {provider} API key',
+  'Open provider console': 'Open provider console',
+  'Read official documentation': 'Read official documentation',
+  'Close': 'Close',
+  'Test AI': 'Test AI',
+  'Testing…': 'Testing…',
+  'AI service works.': 'AI service works.',
+  'AI test failed.': 'AI test failed.',
 
 };
 
@@ -2058,6 +2123,7 @@ const fr: Dictionary = {
   'Menu': 'Menu',
   'Close menu': 'Close menu',
   'Chat room': 'Chat room',
+  'AI Chat': 'AI Chat',
 
   'Loading chats…': 'Loading chats…',
 
@@ -2088,6 +2154,16 @@ const fr: Dictionary = {
   'The quiz needs an internet connection.': 'The quiz needs an internet connection.',
   'Question': 'Question',
   'Add to MyPedia': 'Add to MyPedia',
+
+  'How to get an API key': 'How to get an API key',
+  'Get your {provider} API key': 'Get your {provider} API key',
+  'Open provider console': 'Open provider console',
+  'Read official documentation': 'Read official documentation',
+  'Close': 'Close',
+  'Test AI': 'Test AI',
+  'Testing…': 'Testing…',
+  'AI service works.': 'AI service works.',
+  'AI test failed.': 'AI test failed.',
 
 };
 
@@ -2358,6 +2434,7 @@ const de: Dictionary = {
   'Menu': 'Menu',
   'Close menu': 'Close menu',
   'Chat room': 'Chat room',
+  'AI Chat': 'AI Chat',
 
   'Loading chats…': 'Loading chats…',
 
@@ -2388,6 +2465,16 @@ const de: Dictionary = {
   'The quiz needs an internet connection.': 'The quiz needs an internet connection.',
   'Question': 'Question',
   'Add to MyPedia': 'Add to MyPedia',
+
+  'How to get an API key': 'How to get an API key',
+  'Get your {provider} API key': 'Get your {provider} API key',
+  'Open provider console': 'Open provider console',
+  'Read official documentation': 'Read official documentation',
+  'Close': 'Close',
+  'Test AI': 'Test AI',
+  'Testing…': 'Testing…',
+  'AI service works.': 'AI service works.',
+  'AI test failed.': 'AI test failed.',
 
 };
 

@@ -20,7 +20,8 @@ interface SettingsContextValue {
   language: UiLanguageCode;
   settingsOpen: boolean;
   settingsTrigger: HTMLElement | null;
-  openSettings: (trigger?: HTMLElement | null) => void;
+  settingsSection: string | null;
+  openSettings: (trigger?: HTMLElement | null, section?: string | null) => void;
   closeSettings: () => void;
 }
 
@@ -41,6 +42,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTrigger, setSettingsTrigger] = useState<HTMLElement | null>(null);
+  const [settingsSection, setSettingsSection] = useState<string | null>(null);
   const language = resolveUiLanguageSetting(settings.uiLanguage);
 
   useEffect(() => {
@@ -57,15 +59,17 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setSettings(next);
   }, []);
 
-  const openSettings = useCallback((trigger?: HTMLElement | null) => {
+  const openSettings = useCallback((trigger?: HTMLElement | null, section?: string | null) => {
     const active =
       trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     setSettingsTrigger(active);
+    setSettingsSection(section ?? null);
     setSettingsOpen(true);
   }, []);
 
   const closeSettings = useCallback(() => {
     setSettingsOpen(false);
+    setSettingsSection(null);
   }, []);
 
   const value = useMemo<SettingsContextValue>(
@@ -75,10 +79,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       language,
       settingsOpen,
       settingsTrigger,
+      settingsSection,
       openSettings,
       closeSettings,
     }),
-    [closeSettings, language, openSettings, settings, settingsOpen, settingsTrigger, updateSettings],
+    [closeSettings, language, openSettings, settings, settingsOpen, settingsSection, settingsTrigger, updateSettings],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
