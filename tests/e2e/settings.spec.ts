@@ -5,6 +5,7 @@ import {
   openAppMenu,
   openSettingsFromMenu,
   setSettingsBeforeLoad,
+  waitForFurigana,
   waitForReader,
 } from './helpers';
 
@@ -169,4 +170,12 @@ test('@ai-model-dropdown lists fetched models and supports custom IDs', async ({
   await expect(page.getByTestId('ai-model-select')).toHaveValue('model-two');
   await select.selectOption('__custom__');
   await expect(page.getByTestId('ai-model')).toBeVisible();
+});
+
+
+test('@readings-romaji renders Latin letters above kanji', async ({ page }) => {
+  await setSettingsBeforeLoad(page, { furiganaScript: 'romaji' });
+  await importSample(page);
+  await waitForFurigana(page, 'wagahai');
+  await expect(page.locator('rt').filter({ hasText: 'wagahai' }).first()).toBeVisible();
 });

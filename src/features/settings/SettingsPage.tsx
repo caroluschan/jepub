@@ -334,7 +334,7 @@ export function SettingsPage() {
                   {t('Kana shown above kanji. Katakana is the default.')}
                 </span>
               </div>
-              <div className="segmented" role="group" aria-label={t('Readings')}>
+              <div className="segmented segmented--three" role="group" aria-label={t('Readings')}>
                 <button
                   type="button"
                   className="segmented__option"
@@ -352,6 +352,15 @@ export function SettingsPage() {
                   onClick={() => updateSettings({ furiganaScript: 'hiragana' })}
                 >
                   {t('ひらがな Hiragana')}
+                </button>
+                <button
+                  type="button"
+                  className="segmented__option"
+                  data-testid="readings-romaji"
+                  aria-pressed={settings.furiganaScript === 'romaji'}
+                  onClick={() => updateSettings({ furiganaScript: 'romaji' })}
+                >
+                  {t('ローマ字 Romaji')}
                 </button>
               </div>
               <FuriganaStatusLine status={status} />

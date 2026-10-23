@@ -48,7 +48,7 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Saved conversations remain readable even when AI is Off or BYOT is offline.
 
 **A reader made for Japanese**
-- Kuroshiro furigana above kanji. Katakana readings by default, with a Hiragana option.
+- Kuroshiro furigana above kanji. Katakana readings by default, with Hiragana and Romaji options.
 - Vertical Japanese (`vertical-rl`) or horizontal layout.
 - Adjustable text size from 14–32px.
 - Light and dark monochrome themes.

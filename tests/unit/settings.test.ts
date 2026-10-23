@@ -92,14 +92,16 @@ describe('settings', () => {
     });
   });
 
-  it('SET-SCRIPT defaults to katakana and persists a hiragana choice', () => {
+  it('SET-SCRIPT defaults to katakana and persists kana or romaji choices', () => {
     expect(loadSettings().furiganaScript).toBe('katakana');
     saveSettings({ furiganaScript: 'hiragana' });
     expect(loadSettings().furiganaScript).toBe('hiragana');
+    saveSettings({ furiganaScript: 'romaji' });
+    expect(loadSettings().furiganaScript).toBe('romaji');
     saveSettings({ furiganaScript: 'katakana' });
     expect(loadSettings().furiganaScript).toBe('katakana');
 
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ furiganaScript: 'romaji' }));
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ furiganaScript: 'invalid' }));
     expect(loadSettings().furiganaScript).toBe('katakana');
   });
 

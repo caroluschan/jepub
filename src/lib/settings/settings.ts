@@ -73,7 +73,7 @@ function parseSettings(raw: unknown): Settings {
         : DEFAULT_SETTINGS.orientation,
     furigana: typeof furigana === 'boolean' ? furigana : DEFAULT_SETTINGS.furigana,
     furiganaScript:
-      furiganaScript === 'katakana' || furiganaScript === 'hiragana'
+      furiganaScript === 'katakana' || furiganaScript === 'hiragana' || furiganaScript === 'romaji'
         ? furiganaScript
         : DEFAULT_SETTINGS.furiganaScript,
     onlineTranslation:
@@ -141,7 +141,7 @@ function applyPatch(current: Settings, patch: Partial<Settings>): Settings {
     next.fontSize = clampFontSize(patch.fontSize);
   }
   if (typeof patch.furigana === 'boolean') next.furigana = patch.furigana;
-  if (patch.furiganaScript === 'katakana' || patch.furiganaScript === 'hiragana') {
+  if (patch.furiganaScript === 'katakana' || patch.furiganaScript === 'hiragana' || patch.furiganaScript === 'romaji') {
     next.furiganaScript = patch.furiganaScript;
   }
   if (typeof patch.onlineTranslation === 'boolean') {

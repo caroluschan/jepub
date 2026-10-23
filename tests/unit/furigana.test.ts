@@ -121,7 +121,7 @@ describe('furigana', () => {
       ...makeConverter(calls),
       convertRuby: async (text, script = 'katakana') => {
         calls.push(`ruby:${script}:${text}`);
-        const reading = script === 'hiragana' ? 'ねこ' : 'ネコ';
+        const reading = script === 'hiragana' ? 'ねこ' : script === 'romaji' ? 'neko' : 'ネコ';
         return `<ruby>${text}<rt>${reading}</rt></ruby>`;
       },
     });
@@ -130,6 +130,7 @@ describe('furigana', () => {
     expect(await service.getRuby('猫', 'hiragana')).toContain('ねこ');
     expect(await service.getRuby('猫', 'katakana')).toContain('ネコ');
     expect(await service.getRuby('猫', 'hiragana')).toContain('ねこ');
-    expect(calls).toEqual(['ruby:katakana:猫', 'ruby:hiragana:猫']);
+    expect(await service.getRuby('猫', 'romaji')).toContain('neko');
+    expect(calls).toEqual(['ruby:katakana:猫', 'ruby:hiragana:猫', 'ruby:romaji:猫']);
   });
 });

@@ -524,3 +524,18 @@
 .modal-backdrop--confirm {
   place-items: center;
 }
+
+
+.segmented.segmented--three {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+}
+
+.segmented--three .segmented__option {
+  min-width: 0;
+  padding-inline: 6px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
+}
