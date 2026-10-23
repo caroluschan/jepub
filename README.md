@@ -42,8 +42,13 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Books, covers, chapters, reading positions, translated sentences, chat sessions, and MyPedia records are stored locally in IndexedDB.
 - JEPUB asks the browser for persistent storage, so your shelf survives ordinary browser restarts.
 
+**Find a book**
+- Search the library by book title or author.
+- Filter by author, source, or reading status, with a one-tap **Clear filters** action.
+- The library shows how many books match the active search.
+
 **A single menu**
-- The library header has one menu for **AI Chat**, **MyPedia**, **Quiz**, **Settings**, **Add book**, and the light/dark theme.
+- The library header has one menu ordered **Add book**, **AI Chat**, **MyPedia**, **Quiz**, **Settings**; the light/dark toggle sits beside the close button.
 - **AI Chat** lists saved conversations on this device; open any previous chat, start a new one, or delete old ones.
 - Saved conversations remain readable even when AI is Off or BYOT is offline.
 

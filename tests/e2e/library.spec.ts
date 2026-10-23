@@ -75,3 +75,26 @@ test('@theme-library toggles and persists the theme', async ({ page }) => {
   await toggleThemeFromMenu(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });
+
+test('@library-search filters by title and author', async ({ page }) => {
+  await importSample(page);
+  await page.getByTestId('back-button').click();
+  const search = page.getByTestId('library-search');
+  await expect(search).toBeVisible();
+
+  await search.fill('吾輩');
+  await expect(page.getByTestId('book-card')).toHaveCount(1);
+  await search.fill('夏目');
+  await expect(page.getByTestId('book-card')).toHaveCount(1);
+  await search.fill('missing');
+  await expect(page.getByTestId('library-no-results')).toBeVisible();
+
+  await page.getByTestId('library-no-results').getByRole('button', { name: 'Clear filters' }).click();
+  await expect(page.getByTestId('book-card')).toHaveCount(1);
+  await page.getByTestId('filter-author').selectOption('夏目漱石');
+  await expect(page.getByTestId('book-card')).toHaveCount(1);
+  await page.getByTestId('filter-source').selectOption('sample');
+  await expect(page.getByTestId('book-card')).toHaveCount(1);
+  await page.getByTestId('filter-source').selectOption('text');
+  await expect(page.getByTestId('library-no-results')).toBeVisible();
+});

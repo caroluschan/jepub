@@ -78,17 +78,34 @@ export function AppMenu({ onAddBook }: AppMenuProps) {
         >
           <div className="app-menu__head">
             <span className="label">{t('Menu')}</span>
-            <button
-              ref={closeRef}
-              type="button"
-              className="icon-button"
-              aria-label={t('Close menu')}
-              onClick={close}
-            >
-              <Icon name="close" />
-            </button>
+            <div className="app-menu__head-actions">
+              <button
+                type="button"
+                className="icon-button"
+                aria-label={nextTheme === t('Dark') ? t('Switch to dark theme') : t('Switch to light theme')}
+                data-testid="menu-theme"
+                onClick={toggleTheme}
+              >
+                <Icon name={settings.theme === 'light' ? 'moon' : 'sun'} />
+              </button>
+              <button
+                ref={closeRef}
+                type="button"
+                className="icon-button"
+                aria-label={t('Close menu')}
+                onClick={close}
+              >
+                <Icon name="close" />
+              </button>
+            </div>
           </div>
           <nav className="app-menu__list" aria-label={t('Menu')}>
+            {onAddBook === undefined ? null : (
+              <button type="button" className="app-menu__item" data-testid="menu-add-book" onClick={addBook}>
+                <Icon name="plus" />
+                <span>{t('Add book')}</span>
+              </button>
+            )}
             <button type="button" className="app-menu__item" data-testid="menu-chat" onClick={openChatRoom}>
               <Icon name="chat" />
               <span>{t('AI Chat')}</span>
@@ -106,16 +123,6 @@ export function AppMenu({ onAddBook }: AppMenuProps) {
             <button type="button" className="app-menu__item" data-testid="menu-settings" onClick={openSettingsPage}>
               <Icon name="gear" />
               <span>{t('Settings')}</span>
-            </button>
-            {onAddBook === undefined ? null : (
-              <button type="button" className="app-menu__item" data-testid="menu-add-book" onClick={addBook}>
-                <Icon name="plus" />
-                <span>{t('Add book')}</span>
-              </button>
-            )}
-            <button type="button" className="app-menu__item" data-testid="menu-theme" onClick={toggleTheme}>
-              <Icon name={settings.theme === 'light' ? 'moon' : 'sun'} />
-              <span>{nextTheme}</span>
             </button>
           </nav>
         </Modal>

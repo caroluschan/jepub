@@ -21,7 +21,8 @@ export type IconName =
   | 'menu'
   | 'chat'
   | 'quiz'
-  | 'help';
+  | 'help'
+  | 'search';
 
 interface IconProps {
   name: IconName;
@@ -94,6 +95,12 @@ const paths: Record<IconName, ReactNode> = {
     <>
       <circle cx="12" cy="12" r="9" />
       <path d="M9.5 9a2.5 2.5 0 1 1 4 2c-.9.7-1.5 1.2-1.5 2.5M12 17h.01" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m16 16 4 4" />
     </>
   ),
   gear: (

@@ -149,3 +149,9 @@
   font-size: 13px;
   line-height: 1.5;
 }
+
+.app-menu__head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}

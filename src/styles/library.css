@@ -503,3 +503,110 @@
     padding-top: 8vh;
   }
 }
+
+.library-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.library-search {
+  display: flex;
+  flex: 1 1 240px;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.library-search input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-english);
+  font-size: 15px;
+}
+
+.library-search input::placeholder {
+  color: var(--muted);
+}
+
+.library-search__clear {
+  width: 32px;
+  height: 32px;
+  margin-inline-end: -6px;
+}
+
+.library-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.library-filter {
+  min-height: 40px;
+  max-width: 180px;
+  padding: 0 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.library-filter:focus-visible,
+.library-search:focus-within {
+  border-color: var(--ink);
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.library-clear {
+  min-height: 40px;
+}
+
+.library-no-results {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--font-english);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+@media (max-width: 520px) {
+  .library-search {
+    flex-basis: 100%;
+  }
+
+  .library-filter-group {
+    width: 100%;
+  }
+
+  .library-filter {
+    flex: 1 1 calc(50% - var(--space-2));
+    max-width: none;
+  }
+
+  .library-clear {
+    flex-basis: 100%;
+    justify-self: start;
+  }
+}

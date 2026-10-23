@@ -1,16 +1,20 @@
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AppMenu } from '../../components/AppMenu';
+import { Icon } from '../../components/Icon';
 import { useToast } from '../../components/Toast';
 import { useI18n } from '../../lib/i18n/useI18n';
 import { deleteBook } from '../../lib/storage';
 import type { BookRecord } from '../../lib/types';
 import { AddBookSheet } from './AddBookSheet';
-import { BookCard } from './BookCard';
+import { BookCard, bookPercent } from './BookCard';
 import { DeleteBookDialog } from './DeleteBookDialog';
 import { EmptyState } from './EmptyState';
 import { DropOverlay, ImportOverlay } from './ImportDropzone';
 import { useBookImport } from './useBookImport';
 import { useLibrary } from './useLibrary';
+
+type SourceFilter = 'all' | 'imported' | 'sample' | 'text' | 'aozora' | 'mobi';
+type ReadingFilter = 'all' | 'unread' | 'reading' | 'finished';
 
 function LibrarySkeleton() {
   return (
@@ -41,6 +45,10 @@ export function LibraryPage() {
   const [dragDepth, setDragDepth] = useState(0);
   const [pendingDelete, setPendingDelete] = useState<BookRecord | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [query, setQuery] = useState('');
+  const [authorFilter, setAuthorFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all');
+  const [readingFilter, setReadingFilter] = useState<ReadingFilter>('all');
 
   const openAddSheet = (): void => {
     setAddOpen(true);
@@ -73,6 +81,77 @@ export function LibraryPage() {
     } finally {
       setDeleting(false);
     }
+  };
+
+  const authors = useMemo(
+    () =>
+      [...new Set(books.map((book) => book.author.trim()).filter((author) => author.length > 0))].sort(
+        (left, right) => left.localeCompare(right),
+      ),
+    [books],
+  );
+
+  useEffect(() => {
+    if (authorFilter.length > 0 && !authors.includes(authorFilter)) setAuthorFilter('');
+  }, [authorFilter, authors]);
+
+  const filtersActive =
+    query.trim().length > 0 ||
+    authorFilter.length > 0 ||
+    sourceFilter !== 'all' ||
+    readingFilter !== 'all';
+
+  const filteredBooks = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase();
+    return books.filter((book) => {
+      if (
+        needle.length > 0 &&
+        !`${book.title} ${book.author}`.toLocaleLowerCase().includes(needle)
+      ) {
+        return false;
+      }
+      if (authorFilter.length > 0 && book.author !== authorFilter) return false;
+      if (sourceFilter !== 'all') {
+        if (sourceFilter === 'imported') {
+          if (book.source !== 'file' && book.source !== 'handler' && book.source !== 'drop') {
+            return false;
+          }
+        } else if (sourceFilter === 'sample' && book.source !== 'sample') {
+          return false;
+        } else if (sourceFilter === 'text' && book.source !== 'text') {
+          return false;
+        } else if (sourceFilter === 'aozora' && book.source !== 'aozora') {
+          return false;
+        } else if (sourceFilter === 'mobi' && book.source !== 'mobi') {
+          return false;
+        }
+      }
+      if (readingFilter !== 'all') {
+        const percent = bookPercent(book);
+        if (readingFilter === 'unread' && book.lastOpenedAt !== null) return false;
+        if (readingFilter === 'finished' && percent < 99) return false;
+        if (readingFilter === 'reading' && (book.lastOpenedAt === null || percent >= 99)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [authorFilter, books, query, readingFilter, sourceFilter]);
+
+  const clearFilters = (): void => {
+    setQuery('');
+    setAuthorFilter('');
+    setSourceFilter('all');
+    setReadingFilter('all');
+  };
+
+  const sourceLabel = (source: SourceFilter): string => {
+    if (source === 'imported') return t('Imported');
+    if (source === 'sample') return t('Sample');
+    if (source === 'text') return t('Text');
+    if (source === 'aozora') return t('Aozora');
+    if (source === 'mobi') return t('MOBI');
+    return t('All sources');
   };
 
   const sampleLoading = importing !== null && importing.fileName.includes('吾輩');
@@ -149,23 +228,112 @@ export function LibraryPage() {
 
         {status === 'ready' && books.length > 0 ? (
           <>
+            <div className="library-tools" data-testid="library-tools">
+              <div className="library-search">
+                <Icon name="search" size={17} />
+                <input
+                  type="search"
+                  value={query}
+                  aria-label={t('Search books or authors')}
+                  placeholder={t('Search books or authors')}
+                  data-testid="library-search"
+                  onChange={(event) => setQuery(event.currentTarget.value)}
+                />
+                {query.length > 0 ? (
+                  <button
+                    type="button"
+                    className="icon-button library-search__clear"
+                    aria-label={t('Clear filters')}
+                    onClick={() => setQuery('')}
+                  >
+                    <Icon name="close" size={14} />
+                  </button>
+                ) : null}
+              </div>
+              <div className="library-filter-group">
+                <select
+                  className="library-filter"
+                  aria-label={t('Author')}
+                  data-testid="filter-author"
+                  value={authorFilter}
+                  onChange={(event) => setAuthorFilter(event.currentTarget.value)}
+                >
+                  <option value="">{t('All authors')}</option>
+                  {authors.map((author) => (
+                    <option value={author} key={author}>
+                      {author}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="library-filter"
+                  aria-label={t('Source')}
+                  data-testid="filter-source"
+                  value={sourceFilter}
+                  onChange={(event) => setSourceFilter(event.currentTarget.value as SourceFilter)}
+                >
+                  <option value="all">{t('All sources')}</option>
+                  <option value="imported">{sourceLabel('imported')}</option>
+                  <option value="sample">{sourceLabel('sample')}</option>
+                  <option value="text">{sourceLabel('text')}</option>
+                  <option value="aozora">{sourceLabel('aozora')}</option>
+                  <option value="mobi">{sourceLabel('mobi')}</option>
+                </select>
+                <select
+                  className="library-filter"
+                  aria-label={t('Reading status')}
+                  data-testid="filter-status"
+                  value={readingFilter}
+                  onChange={(event) => setReadingFilter(event.currentTarget.value as ReadingFilter)}
+                >
+                  <option value="all">{t('All reading statuses')}</option>
+                  <option value="unread">{t('Unread')}</option>
+                  <option value="reading">{t('In progress')}</option>
+                  <option value="finished">{t('Finished')}</option>
+                </select>
+                {filtersActive ? (
+                  <button
+                    type="button"
+                    className="button--text library-clear"
+                    onClick={clearFilters}
+                  >
+                    {t('Clear filters')}
+                  </button>
+                ) : null}
+              </div>
+            </div>
             <div className="library-lede">
               <div>
-                <p className="label">
-                  {books.length === 1
-                    ? t('Library · 1 volume')
-                    : t('Library · {count} volumes', { count: books.length })}
+                <p className="label" aria-live="polite">
+                  {filtersActive
+                    ? t('Showing {count} of {total}', {
+                        count: filteredBooks.length,
+                        total: books.length,
+                      })
+                    : books.length === 1
+                      ? t('Library · 1 volume')
+                      : t('Library · {count} volumes', { count: books.length })}
                 </p>
                 <p className="library-tagline" lang="ja">
                   日本語を、ゆっくり。
                 </p>
               </div>
             </div>
-            <div className="book-grid">
-              {books.map((book) => (
-                <BookCard key={book.id} book={book} onDelete={setPendingDelete} />
-              ))}
-            </div>
+            {filteredBooks.length > 0 ? (
+              <div className="book-grid">
+                {filteredBooks.map((book) => (
+                  <BookCard key={book.id} book={book} onDelete={setPendingDelete} />
+                ))}
+              </div>
+            ) : (
+              <div className="library-no-results" data-testid="library-no-results">
+                <p>{t('No books match.')}</p>
+                <p>{t('Try a different search or clear the filters.')}</p>
+                <button type="button" className="button" onClick={clearFilters}>
+                  {t('Clear filters')}
+                </button>
+              </div>
+            )}
           </>
         ) : null}
       </main>
