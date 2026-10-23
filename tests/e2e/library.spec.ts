@@ -79,6 +79,8 @@ test('@theme-library toggles and persists the theme', async ({ page }) => {
 test('@library-search filters by title and author', async ({ page }) => {
   await importSample(page);
   await page.getByTestId('back-button').click();
+  await expect(page.getByTestId('library-search')).toHaveCount(0);
+  await page.getByTestId('library-filter-toggle').click();
   const search = page.getByTestId('library-search');
   await expect(search).toBeVisible();
 
@@ -97,4 +99,7 @@ test('@library-search filters by title and author', async ({ page }) => {
   await expect(page.getByTestId('book-card')).toHaveCount(1);
   await page.getByTestId('filter-source').selectOption('text');
   await expect(page.getByTestId('library-no-results')).toBeVisible();
+  await page.getByTestId('library-filter-toggle').click();
+  await expect(page.getByTestId('library-search')).toHaveCount(0);
+  await expect(page.getByTestId('library-filter-toggle')).toHaveAttribute('aria-expanded', 'false');
 });

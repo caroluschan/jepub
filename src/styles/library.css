@@ -610,3 +610,37 @@
     justify-self: start;
   }
 }
+
+.library-filter-toggle {
+  flex: none;
+  gap: 6px;
+  min-height: 40px;
+  padding-inline: 12px;
+  border-color: var(--line-strong);
+  background: transparent;
+}
+
+.library-filter-toggle--active {
+  border-color: var(--ink);
+}
+
+.library-filter-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: 4px;
+  border-radius: 9px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .library-filter-toggle {
+    align-self: stretch;
+    justify-content: center;
+  }
+}

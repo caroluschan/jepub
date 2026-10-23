@@ -49,6 +49,7 @@ export function LibraryPage() {
   const [authorFilter, setAuthorFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all');
   const [readingFilter, setReadingFilter] = useState<ReadingFilter>('all');
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const openAddSheet = (): void => {
     setAddOpen(true);
@@ -95,11 +96,12 @@ export function LibraryPage() {
     if (authorFilter.length > 0 && !authors.includes(authorFilter)) setAuthorFilter('');
   }, [authorFilter, authors]);
 
-  const filtersActive =
-    query.trim().length > 0 ||
-    authorFilter.length > 0 ||
-    sourceFilter !== 'all' ||
-    readingFilter !== 'all';
+  const activeFilterCount =
+    (query.trim().length > 0 ? 1 : 0) +
+    (authorFilter.length > 0 ? 1 : 0) +
+    (sourceFilter !== 'all' ? 1 : 0) +
+    (readingFilter !== 'all' ? 1 : 0);
+  const filtersActive = activeFilterCount > 0;
 
   const filteredBooks = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
@@ -228,8 +230,41 @@ export function LibraryPage() {
 
         {status === 'ready' && books.length > 0 ? (
           <>
-            <div className="library-tools" data-testid="library-tools">
-              <div className="library-search">
+            <div className="library-lede">
+              <div>
+                <p className="label" aria-live="polite">
+                  {filtersActive
+                    ? t('Showing {count} of {total}', {
+                        count: filteredBooks.length,
+                        total: books.length,
+                      })
+                    : books.length === 1
+                      ? t('Library · 1 volume')
+                      : t('Library · {count} volumes', { count: books.length })}
+                </p>
+                <p className="library-tagline" lang="ja">
+                  日本語を、ゆっくり。
+                </p>
+              </div>
+              <button
+                type="button"
+                className={`button button--quiet library-filter-toggle${filtersActive ? ' library-filter-toggle--active' : ''}`}
+                aria-expanded={filtersOpen}
+                aria-controls="library-filters"
+                aria-label={filtersOpen ? t('Hide filters') : t('Show filters')}
+                data-testid="library-filter-toggle"
+                onClick={() => setFiltersOpen((open) => !open)}
+              >
+                <Icon name="filter" size={16} />
+                <span>{t('Filters')}</span>
+                {activeFilterCount > 0 ? (
+                  <span className="library-filter-count">{activeFilterCount}</span>
+                ) : null}
+              </button>
+            </div>
+            {filtersOpen ? (
+              <div id="library-filters" className="library-tools" data-testid="library-tools">
+   <div className="library-search">
                 <Icon name="search" size={17} />
                 <input
                   type="search"
@@ -301,24 +336,8 @@ export function LibraryPage() {
                   </button>
                 ) : null}
               </div>
-            </div>
-            <div className="library-lede">
-              <div>
-                <p className="label" aria-live="polite">
-                  {filtersActive
-                    ? t('Showing {count} of {total}', {
-                        count: filteredBooks.length,
-                        total: books.length,
-                      })
-                    : books.length === 1
-                      ? t('Library · 1 volume')
-                      : t('Library · {count} volumes', { count: books.length })}
-                </p>
-                <p className="library-tagline" lang="ja">
-                  日本語を、ゆっくり。
-                </p>
-              </div>
-            </div>
+                          </div>
+            ) : null}
             {filteredBooks.length > 0 ? (
               <div className="book-grid">
                 {filteredBooks.map((book) => (

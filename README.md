@@ -43,9 +43,9 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - JEPUB asks the browser for persistent storage, so your shelf survives ordinary browser restarts.
 
 **Find a book**
-- Search the library by book title or author.
-- Filter by author, source, or reading status, with a one-tap **Clear filters** action.
-- The library shows how many books match the active search.
+- Use the **Filters** button to reveal search and filters only when needed.
+- Search by book title or author; filter by author, source, or reading status.
+- The active-filter count stays visible, and a one-tap **Clear filters** action resets everything.
 
 **A single menu**
 - The library header has one menu ordered **Add book**, **AI Chat**, **MyPedia**, **Quiz**, **Settings**; the light/dark toggle sits beside the close button.
