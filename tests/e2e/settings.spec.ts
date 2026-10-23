@@ -142,3 +142,31 @@ test('@ai-test reports a working BYOT connection', async ({ page }) => {
   await page.getByTestId('ai-test').getByRole('button', { name: 'Test AI' }).click();
   await expect(page.getByTestId('ai-test-result')).toContainText('AI service works.');
 });
+
+test('@ai-model-dropdown lists fetched models and supports custom IDs', async ({ page }) => {
+  await setSettingsBeforeLoad(page, {
+    aiMode: 'byot',
+    aiProvider: 'custom',
+    aiApiKey: 'test-key',
+    aiModel: 'model-one',
+    aiBaseUrl: 'https://example.test/v1',
+  });
+  await page.route('https://example.test/v1/models', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({ data: [{ id: 'model-one' }, { id: 'model-two' }] }),
+    });
+  });
+  await gotoLibrary(page);
+  await openSettingsFromMenu(page);
+  const select = page.getByTestId('ai-model-select');
+  await expect(select).toBeVisible();
+  await expect(select.locator('option')).toHaveCount(4);
+  await expect(select.locator('option[value="model-two"]')).toHaveCount(1);
+  await select.selectOption('model-two');
+  await expect(page.getByTestId('ai-model-select')).toHaveValue('model-two');
+  await select.selectOption('__custom__');
+  await expect(page.getByTestId('ai-model')).toBeVisible();
+});

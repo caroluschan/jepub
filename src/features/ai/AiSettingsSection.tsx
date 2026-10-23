@@ -20,6 +20,7 @@ export function AiSettingsSection() {
   const [modelsState, setModelsState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [modelsError, setModelsError] = useState<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [customModelMode, setCustomModelMode] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
@@ -28,6 +29,9 @@ export function AiSettingsSection() {
   const mode: AiMode = settings.aiMode === 'local' && !localAvailable ? 'off' : settings.aiMode;
   const isLocal = mode === 'local';
   const isByot = mode === 'byot';
+  const modelInList = models.includes(settings.aiModel);
+  const showCustomModel =
+    customModelMode || (modelsState === 'ready' && settings.aiModel.length > 0 && !modelInList);
   const canTest =
     mode === 'local'
       ? settings.llmConsent
@@ -94,6 +98,7 @@ export function AiSettingsSection() {
 
   const changeProvider = (next: ByotProviderId): void => {
     const definition = getByotProvider(next);
+    setCustomModelMode(false);
     updateSettings({
       aiProvider: next,
       aiModel: definition.defaultModel,
@@ -258,22 +263,43 @@ export function AiSettingsSection() {
                 {t('Refresh models')}
               </button>
             </div>
-            <input
-              id="ai-model"
-              className="settings-input"
-              data-testid="ai-model"
-              list="ai-model-options"
-              placeholder={t('Enter a model ID')}
-              value={settings.aiModel}
-              onChange={(event) =>
-                updateSettings({ aiModel: event.currentTarget.value })
-              }
-            />
-            <datalist id="ai-model-options">
-              {models.map((name) => (
-                <option key={name} value={name} />
-              ))}
-            </datalist>
+            {modelsState === 'ready' && models.length > 0 ? (
+              <select
+                id="ai-model"
+                className="settings-select"
+                data-testid="ai-model-select"
+                value={showCustomModel ? '__custom__' : settings.aiModel}
+                onChange={(event) => {
+                  const value = event.currentTarget.value;
+                  if (value === '__custom__') {
+                    setCustomModelMode(true);
+                    return;
+                  }
+                  setCustomModelMode(false);
+                  updateSettings({ aiModel: value });
+                }}
+              >
+                <option value="">{t('Select a model')}</option>
+                {models.map((name) => (
+                  <option value={name} key={name}>
+                    {name}
+                  </option>
+                ))}
+                <option value="__custom__">{t('Custom model ID…')}</option>
+              </select>
+            ) : null}
+            {modelsState !== 'ready' || models.length === 0 || showCustomModel ? (
+              <input
+                id={modelsState === 'ready' && models.length > 0 ? 'ai-custom-model' : 'ai-model'}
+                className="settings-input"
+                data-testid="ai-model"
+                placeholder={t('Enter a model ID')}
+                value={settings.aiModel}
+                onChange={(event) =>
+                  updateSettings({ aiModel: event.currentTarget.value })
+                }
+              />
+            ) : null}
 
             <p className="settings-row__note" data-testid="ai-models-status">
               {modelsState === 'loading'

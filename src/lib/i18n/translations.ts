@@ -291,6 +291,8 @@ export const ENGLISH_SOURCES = [
   'Testing…',
   'AI service works.',
   'AI test failed.',
+  'Select a model',
+  'Custom model ID…',
 ] as const;
 
 export type TranslationKey = (typeof ENGLISH_SOURCES)[number];
@@ -610,6 +612,9 @@ const ja: Dictionary = {
   'AI service works.': 'AI service works.',
   'AI test failed.': 'AI test failed.',
 
+  'Select a model': 'Select a model',
+  'Custom model ID…': 'Custom model ID…',
+
 };
 
 const zhCN: Dictionary = {
@@ -920,6 +925,9 @@ const zhCN: Dictionary = {
   'Testing…': 'Testing…',
   'AI service works.': 'AI service works.',
   'AI test failed.': 'AI test failed.',
+
+  'Select a model': 'Select a model',
+  'Custom model ID…': 'Custom model ID…',
 
 };
 
@@ -1232,6 +1240,9 @@ const zhTW: Dictionary = {
   'AI service works.': 'AI service works.',
   'AI test failed.': 'AI test failed.',
 
+  'Select a model': 'Select a model',
+  'Custom model ID…': 'Custom model ID…',
+
 };
 
 const ko: Dictionary = {
@@ -1542,6 +1553,9 @@ const ko: Dictionary = {
   'Testing…': 'Testing…',
   'AI service works.': 'AI service works.',
   'AI test failed.': 'AI test failed.',
+
+  'Select a model': 'Select a model',
+  'Custom model ID…': 'Custom model ID…',
 
 };
 
@@ -1854,6 +1868,9 @@ const es: Dictionary = {
   'AI service works.': 'AI service works.',
   'AI test failed.': 'AI test failed.',
 
+  'Select a model': 'Select a model',
+  'Custom model ID…': 'Custom model ID…',
+
 };
 
 const fr: Dictionary = {
@@ -2165,6 +2182,9 @@ const fr: Dictionary = {
   'AI service works.': 'AI service works.',
   'AI test failed.': 'AI test failed.',
 
+  'Select a model': 'Select a model',
+  'Custom model ID…': 'Custom model ID…',
+
 };
 
 const de: Dictionary = {
@@ -2475,6 +2495,9 @@ const de: Dictionary = {
   'Testing…': 'Testing…',
   'AI service works.': 'AI service works.',
   'AI test failed.': 'AI test failed.',
+
+  'Select a model': 'Select a model',
+  'Custom model ID…': 'Custom model ID…',
 
 };
 
