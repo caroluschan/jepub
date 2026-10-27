@@ -89,7 +89,8 @@ JEPUB is a small, monochrome reading room for Japanese books. It keeps your libr
 - Set up AI from **AI Chat** or Settings; AI Chat stays in the menu even while AI is Off and links directly to the AI settings section.
 - The **?** beside **API key** opens provider-specific steps with links to the official console and documentation for that provider.
 - **Test AI** checks the selected provider/model with a tiny request before you rely on it.
-- Choose **Off**, **BYOT** (bring your own token), or **Local** in Settings.
+- Choose **Off**, **BYOT** (bring your own token), **Local**, or the keyless **OVHcloud (Free & Unstable)** endpoint in Settings.
+- **OVHcloud** uses the public, unauthenticated OVHcloud AI Endpoints service; no key is required, but availability and speed are not guaranteed.
 - **BYOT** calls the provider you choose directly: OpenAI, Anthropic, Google Gemini, OpenRouter, Groq, Mistral, DeepSeek, xAI, Together AI, Cerebras, Perplexity, Fireworks AI, Qwen/DashScope, or a custom OpenAI-compatible endpoint.
 - BYOT keeps the API key in this browser, fetches the provider's current model list when possible, and always allows a manually typed model ID when the catalog changes.
 - **Ask AI** and **Chat More** work the same in every mode; answers render sanitized Markdown and chat sessions stay in IndexedDB on this device.

@@ -12,6 +12,7 @@ import type { AiMode, ChatMessage, LlmSupport } from '../../lib/types';
 import { detectLlmSupport } from '../../lib/llm/capabilities';
 import { LlmClient } from '../../lib/llm/client';
 import { byotBaseUrl, generateByot, getByotProvider } from '../../lib/llm/byot';
+import { generateOvh } from '../../lib/llm/ovh';
 import { useOnline } from '../../lib/network/useOnline';
 import { useSettings } from '../settings/SettingsProvider';
 
@@ -68,7 +69,8 @@ export function LlmProvider({ children }: { children: ReactNode }) {
   const hasKey = settings.aiApiKey.trim().length > 0 || settings.aiProvider === 'custom';
   const hasBaseUrl = settings.aiProvider !== 'custom' || settings.aiBaseUrl.trim().length > 0;
   const byotConfigured = selectedModel.length > 0 && hasKey && hasBaseUrl;
-  const canUse = mode === 'local' ? localSupported : mode === 'byot' ? byotConfigured : false;
+  const canUse =
+    mode === 'local' ? localSupported : mode === 'byot' ? byotConfigured : mode === 'ovh' ? true : false;
 
   useEffect(() => {
     let active = true;
@@ -145,6 +147,10 @@ export function LlmProvider({ children }: { children: ReactNode }) {
       onToken: (token: string) => void,
       maxTokens?: number,
     ): Promise<string> => {
+      if (mode === 'ovh') {
+        if (!online) throw new Error('OVHcloud needs an internet connection.');
+        return generateOvh(messages, onToken, maxTokens);
+      }
       if (mode === 'byot') {
         if (!online) throw new Error('BYOT needs an internet connection.');
         if (!byotConfigured) throw new Error('Set up BYOT in AI settings first.');

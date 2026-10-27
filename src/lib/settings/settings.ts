@@ -82,7 +82,7 @@ function parseSettings(raw: unknown): Settings {
         : DEFAULT_SETTINGS.onlineTranslation,
     llmConsent: typeof llmConsent === 'boolean' ? llmConsent : DEFAULT_SETTINGS.llmConsent,
     aiMode:
-      aiMode === 'off' || aiMode === 'byot' || aiMode === 'local'
+      aiMode === 'off' || aiMode === 'byot' || aiMode === 'local' || aiMode === 'ovh'
         ? aiMode
         : typeof llmConsent === 'boolean' && llmConsent
           ? 'local'
@@ -150,7 +150,7 @@ function applyPatch(current: Settings, patch: Partial<Settings>): Settings {
   if (typeof patch.llmConsent === 'boolean') {
     next.llmConsent = patch.llmConsent;
   }
-  if (patch.aiMode === 'off' || patch.aiMode === 'byot' || patch.aiMode === 'local') {
+  if (patch.aiMode === 'off' || patch.aiMode === 'byot' || patch.aiMode === 'local' || patch.aiMode === 'ovh') {
     next.aiMode = patch.aiMode;
   }
   if (

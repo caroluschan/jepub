@@ -2,7 +2,7 @@ export type Theme = 'light' | 'dark';
 export type Orientation = 'horizontal' | 'vertical';
 export type FuriganaScript = 'katakana' | 'hiragana' | 'romaji';
 
-export type AiMode = 'off' | 'byot' | 'local';
+export type AiMode = 'off' | 'byot' | 'local' | 'ovh';
 export type ByotProviderId =
   | 'openai'
   | 'anthropic'

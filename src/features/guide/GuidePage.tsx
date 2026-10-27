@@ -118,7 +118,7 @@ export function GuidePage() {
         <section className="guide-section" id="guide-ai">
           <h2>{t('Set up AI')}</h2>
           <p>
-            {t('AI is optional. Choose Off, BYOT, or Local. BYOT uses your own provider key; Local runs entirely on this device.')}
+            {t('AI is optional. Choose Off, BYOT, Local, or OVHcloud. BYOT uses your own provider key; Local runs entirely on this device.')}
           </p>
           <p>
             {t('Use the ? beside API key for provider-specific steps and official links. Test AI checks the connection before you rely on it.')}
@@ -162,7 +162,7 @@ export function GuidePage() {
         <section className="guide-section" id="guide-help">
           <h2>{t('Troubleshooting')}</h2>
           <p>
-            {t('No Local option? Your device may not meet the WebGPU memory gate. BYOT still works with a connection.')}
+            {t('No Local option? Your device may not meet the WebGPU memory gate. BYOT or OVHcloud still work with a connection.')}
           </p>
           <p>{t('BYOT offline? It needs a connection until you have a local model and Local mode available.')}</p>
           <p>

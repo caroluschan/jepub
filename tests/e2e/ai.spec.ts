@@ -140,3 +140,37 @@ test('@ai-byot streams from a custom OpenAI-compatible provider', async ({ page 
   await expect(page.locator('.sentence-sheet__ai-answer strong')).toHaveText('BYOT');
   await expect(page.locator('.sentence-sheet__ai-answer li')).toHaveCount(2);
 });
+
+
+test('@ai-ovh uses the anonymous OVHcloud endpoint', async ({ page }) => {
+  await installApiMocks(page, { translator: 'none' });
+  await installGpu(page, false);
+  await setSettingsBeforeLoad(page, { aiMode: 'ovh' });
+  await page.route('https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions', async (route) => {
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({
+        status: 204,
+        headers: {
+          'access-control-allow-origin': '*',
+          'access-control-allow-methods': 'POST, OPTIONS',
+          'access-control-allow-headers': 'content-type, accept',
+        },
+      });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({
+        choices: [{ message: { role: 'assistant', content: 'OVHcloud answer.' } }],
+      }),
+    });
+  });
+
+  await importSample(page);
+  await openSentence(page);
+  await expect(page.getByTestId('ask-ai')).toBeVisible();
+  await page.getByTestId('ask-ai-button').click();
+  await expect(page.locator('.sentence-sheet__ai-answer')).toContainText('OVHcloud answer.');
+});

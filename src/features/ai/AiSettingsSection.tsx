@@ -29,13 +29,18 @@ export function AiSettingsSection() {
   const mode: AiMode = settings.aiMode === 'local' && !localAvailable ? 'off' : settings.aiMode;
   const isLocal = mode === 'local';
   const isByot = mode === 'byot';
+  const isOvh = mode === 'ovh';
   const modelInList = models.includes(settings.aiModel);
   const showCustomModel =
     customModelMode || (modelsState === 'ready' && settings.aiModel.length > 0 && !modelInList);
   const canTest =
     mode === 'local'
       ? settings.llmConsent
-      : mode === 'byot' && llm.byotConfigured && llm.online;
+      : mode === 'byot'
+        ? llm.byotConfigured && llm.online
+        : mode === 'ovh'
+          ? llm.online
+          : false;
 
   useEffect(() => {
     if (!isByot) return;
@@ -180,6 +185,7 @@ export function AiSettingsSection() {
           <option value="off">{t('Off')}</option>
           <option value="byot">{t('BYOT')}</option>
           {localAvailable ? <option value="local">{t('Local')}</option> : null}
+          <option value="ovh">{t('OVHcloud (Free & Unstable)')}</option>
         </select>
 
         {mode === 'off' ? (
@@ -321,6 +327,23 @@ export function AiSettingsSection() {
             <p className="settings-row__note">
               {t('Your key, sent directly to {provider}.', { provider: provider.label })}
             </p>
+          </div>
+        ) : null}
+
+        {isOvh ? (
+          <div className="ai-byot" data-testid="ai-ovh">
+            <div className="settings-row__copy">
+              <span className="settings-row__title">{t('OVHcloud (Free & Unstable)')}</span>
+              <span className="settings-row__note">
+                {t('OVHcloud is a free, unauthenticated endpoint. It may be slow or unavailable.')}
+              </span>
+            </div>
+            <p className="settings-row__note">Model: mistral@latest</p>
+            {!llm.online ? (
+              <p className="settings-row__note" data-testid="ai-offline-note">
+                {t('OVHcloud needs an internet connection.')}
+              </p>
+            ) : null}
           </div>
         ) : null}
 

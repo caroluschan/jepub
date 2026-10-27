@@ -42,7 +42,8 @@ export function ChatPage({ sessionId }: ChatPageProps) {
   const [history, setHistory] = useState<ChatSession[]>([]);
   const isLocal = llm.mode === 'local';
   const isByot = llm.mode === 'byot';
-  const offlineByot = isByot && !llm.online;
+  const isOvh = llm.mode === 'ovh';
+  const offlineRemote = (isByot || isOvh) && !llm.online;
   const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -98,7 +99,7 @@ export function ChatPage({ sessionId }: ChatPageProps) {
   const send = async (): Promise<void> => {
     const text = input.trim();
     if (text.length === 0 || sending || session === null) return;
-    if (offlineByot) return;
+    if (offlineRemote) return;
     if (isByot && !llm.byotConfigured) {
       openSettings(undefined, 'ai');
       return;
@@ -220,7 +221,9 @@ export function ChatPage({ sessionId }: ChatPageProps) {
           <Icon name="arrow-left" />
         </button>
         <div className="chat-page__heading">
-          <span className="label">{isByot ? t('BYOT') : t('AI chat')}</span>
+          <span className="label">
+            {isByot ? t('BYOT') : isOvh ? t('OVHcloud (Free & Unstable)') : t('AI chat')}
+          </span>
           <h1 className="chat-page__title">{session?.title ?? t('AI chat')}</h1>
         </div>
         <div className="chat-page__header-actions">
@@ -323,7 +326,7 @@ export function ChatPage({ sessionId }: ChatPageProps) {
               rows={2}
               value={input}
               placeholder={t('Ask about Japanese grammar, vocabulary, or this book.')}
-              disabled={sending || offlineByot}
+              disabled={sending || offlineRemote}
               onChange={(event) => setInput(event.currentTarget.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
@@ -335,15 +338,15 @@ export function ChatPage({ sessionId }: ChatPageProps) {
             <button
               type="submit"
               className="button"
-              disabled={sending || offlineByot || input.trim().length === 0}
+              disabled={sending || offlineRemote || input.trim().length === 0}
             >
               {t('Send')}
             </button>
           </div>
           <p className="chat-page__note">{t('Your chat stays on this device.')}</p>
-          {offlineByot ? (
+          {offlineRemote ? (
             <p className="chat-page__note" data-testid="ai-offline-note">
-              {t('BYOT needs an internet connection.')}
+              {isByot ? t('BYOT needs an internet connection.') : t('OVHcloud needs an internet connection.')}
             </p>
           ) : null}
         </form>

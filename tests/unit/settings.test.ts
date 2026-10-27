@@ -100,6 +100,8 @@ describe('settings', () => {
     expect(loadSettings().furiganaScript).toBe('romaji');
     saveSettings({ furiganaScript: 'katakana' });
     expect(loadSettings().furiganaScript).toBe('katakana');
+    saveSettings({ aiMode: 'ovh' });
+    expect(loadSettings().aiMode).toBe('ovh');
 
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ furiganaScript: 'invalid' }));
     expect(loadSettings().furiganaScript).toBe('katakana');

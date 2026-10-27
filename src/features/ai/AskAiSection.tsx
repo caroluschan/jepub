@@ -52,7 +52,9 @@ export function AskAiSection({
 
   if (llm.checking || !llm.canUse) return null;
   const isLocal = llm.mode === 'local';
-  const isOfflineByot = llm.mode === 'byot' && !llm.online;
+  const isByot = llm.mode === 'byot';
+  const isOvh = llm.mode === 'ovh';
+  const offlineRemote = (isByot || isOvh) && !llm.online;
 
   const run = async (): Promise<void> => {
     setAskState('loading');
@@ -93,7 +95,7 @@ export function AskAiSection({
   };
 
   const ask = (): void => {
-    if (isOfflineByot) return;
+    if (offlineRemote) return;
     if (isLocal && !settings.llmConsent) {
       setConsentOpen(true);
       return;
@@ -131,13 +133,17 @@ export function AskAiSection({
   return (
     <div className="sentence-sheet__ai" data-testid="ask-ai">
       <div className="sentence-sheet__ai-head">
-        <span className="label">{isLocal ? t('On-device AI') : t('BYOT')}</span>
+        <span className="label">
+          {isLocal ? t('On-device AI') : isByot ? t('BYOT') : t('OVHcloud (Free & Unstable)')}
+        </span>
         <span className="provider-chip">
           {isLocal
             ? t('Small local model. It can make mistakes.')
-            : t('Your key, sent directly to {provider}.', {
-                provider: getProviderLabel(settings.aiProvider),
-              })}
+            : isByot
+              ? t('Your key, sent directly to {provider}.', {
+                  provider: getProviderLabel(settings.aiProvider),
+                })
+              : t('Free anonymous endpoint.')}
         </span>
       </div>
 
@@ -168,7 +174,7 @@ export function AskAiSection({
           type="button"
           className="button button--quiet"
           data-testid="ask-ai-button"
-          disabled={askState === 'loading' || isOfflineByot}
+          disabled={askState === 'loading' || offlineRemote}
           onClick={ask}
         >
           {t('Ask AI')}
@@ -180,9 +186,9 @@ export function AskAiSection({
         ) : null}
       </div>
 
-      {isOfflineByot ? (
+      {offlineRemote ? (
         <p className="sentence-sheet__ai-progress" data-testid="ai-offline-note">
-          {t('BYOT needs an internet connection.')}
+          {isByot ? t('BYOT needs an internet connection.') : t('OVHcloud needs an internet connection.')}
         </p>
       ) : null}
 
